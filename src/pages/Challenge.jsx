@@ -51,7 +51,7 @@ const Challenge = () => {
         });
 
         if (health < userData.currentEnergy) health = userData.energyLimit;
-        if (attack <= 0) attack = 2;
+        if (attack <= 0) attack = 3;
         if (defence <= 0) defence = 1;
 
         let user = {
@@ -170,7 +170,9 @@ const Challenge = () => {
     }
 
     const showResult = () => {
-
+        if (mine.curHealth > monster.curHealth) setIsWin(1);
+        else                    setIsWin(2);
+        clearTimeout(interval);
     }
 
     const handleAttack = () => {
@@ -335,7 +337,7 @@ const Challenge = () => {
                     </div>
 
                     <div className="flex gap-3 justify-center items-center">
-                        <h2>Battle Time Left:</h2>
+                        <h2>Battle Time Elapsed:</h2>
                         <div style={{ textAlign: 'center'}}>
                             <div style={{ fontSize: '48px', fontWeight: 'bold' }}>
                                 {Math.ceil(battleTime / 5).toString().padStart(2, '0')}
@@ -361,7 +363,7 @@ const Challenge = () => {
                         {backShow && isWin == 1 ? "Win!" : "Lose!"}
                     </div>
 
-                    <div className="border bg-[#0000e2] mt-20 w-fit mx-auto py-1 px-5 text-[24px]" onClick={() => showResult()}>
+                    <div className="border bg-[#0000e2] mt-20 w-fit mx-auto py-1 px-5 text-[24px] cursor-pointer rounded-full" onClick={() => showResult()}>
                         Show Result
                     </div>
 

@@ -25,14 +25,14 @@ const ShopItem = ({ onItemSelect }) => {
                 return(
                     <div key={item._id} className="relative mb-3">
                         <img src={item.imageSrc} alt={item.imageAlt} className='w-full h-full'/>
-                        <p className='absolute bottom-[20%] left-[27%] text-white text-[12px]'>Level: {item.level}</p>
-                        <p className='absolute bottom-[7%] left-[18%] text-white text-[12px]'>Price: {item.price}</p>
+                        <p className='absolute bottom-[20%] left-[27%] text-white text-[12px]'>Lv: {item.levelIndex}</p>
+                        <p className='absolute bottom-[7%] left-[25%] text-white text-[12px]'>$: {item.price}</p>
                         <div className="absolute bottom-[-20px] left-[25%]">
                         {
                             !isBought ? 
                                 <Button className="py-1 px-2 text-sm" color="green" 
                                     onClick={() => onItemSelect(item)}>Buy</Button> : 
-                                <PiCheckFatFill size={36} className='text-[green] text-btn4'/>
+                                <PiCheckFatFill size={32} className='text-[green] text-btn4'/>
                         }
                         </div>
                     </div>

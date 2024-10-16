@@ -1,0 +1,2 @@
+export const VIEW_ACTIVITY = 'VIEW_ACTIVITY';
+export const UPDATE_ACTIVITY = 'UPDATE_ACTIVITY';

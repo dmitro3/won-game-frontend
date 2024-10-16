@@ -4,12 +4,14 @@ import Animate from "../components/Animate";
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { getMonsters, setFightMonster } from '../actions/other';
+import { showPayment } from '../actions/other';
 
 const Tournament = () => {
 
     const nav = useNavigate();
     const dispatch = useDispatch();
     const monsters = useSelector((state) => state.other.monster);
+    const userData = useSelector((state) => state.earn.user);
 
     useEffect(() => {
         dispatch(getMonsters());
@@ -17,6 +19,10 @@ const Tournament = () => {
 
     const onFight = (monster) => {
         console.log("monster", monster);
+        if(userData.tokens < monster.tokenSpend) {
+            dispatch(showPayment(true));
+            return;
+        }
         dispatch(setFightMonster(monster));
         nav("/home/challenge");
     }
@@ -57,11 +63,11 @@ const Tournament = () => {
                             </div>
                             <div className='flex flex-col text-start text-[12px]'>
                                 <div className='flex gap-2 items-center'>
-                                    <img src="/assets/img/loader.webp" alt="avatar" className="h-[14px] w-[14px] rounded-full" />
+                                    <img src="/assets/img/coin.webp" alt="avatar" className="h-[14px] w-[14px] rounded-full" />
                                     <p>{monster.tokenEarns}</p>
                                 </div>
                                 <div className='flex gap-2 items-center'>
-                                    <img src="/assets/img/coin.webp" alt="avatar" className="h-[14px] w-[14px] rounded-full" />
+                                    <img src="/assets/img/loader.webp" alt="avatar" className="h-[14px] w-[14px] rounded-full" />
                                     <p>{monster.tokenSpend}</p>
                                 </div>
                                 <div className='border rounded-lg bg-deep-orange-800 px-2 cursor-pointer' onClick={()=> onFight(monster)}>

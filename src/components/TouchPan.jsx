@@ -4,6 +4,7 @@ import { PiHandTap, PiCheckFatFill } from 'react-icons/pi';
 import styled, { keyframes } from "styled-components";
 import { useDispatch, useSelector } from 'react-redux';
 import { viewUser, updateUser } from '../actions/earn';
+import { viewActivity, updateActivity } from '../actions/activity';
 import { showPayment, getChallenge } from '../actions/other';
 import { viewMilestones, updateMilestone } from '../actions/milestone';
 import { useNavigate } from 'react-router-dom';
@@ -38,7 +39,7 @@ const TouchPan = () => {
   const [coin, setCoin] = useState(0);
   const [tapped, setTapped] = useState(0);
   const [level, setLevel] = useState(0);
-  const [tapLimit, setTapLimit] = useState(100);
+  const [tapLimit, setTapLimit] = useState(0);
   const [tapSpeed, setTapSpeed] = useState(1);
   const [currentEnergy, setCurrentEnergy] = useState(0);
   const [totalEnergy, setTotalEnergy] = useState(0);
@@ -47,14 +48,14 @@ const TouchPan = () => {
   const imageRef = useRef(null);
   const dispatch = useDispatch();
   const userData = useSelector((state) => state.earn.user);
-  const levelData = useSelector((state) => state.earn.level);
+  const activityData = useSelector((state)=> state.activity.activity);
   const milestoneData = useSelector((state) => state.milestone.milestones);
   const nav = useNavigate();
   
   useEffect(() => {
       dispatch(viewMilestones());
-      console.log("View User");
       dispatch(viewUser());
+      dispatch(viewActivity());
   },[]);
 
   const isEmpty = (val) => {
@@ -68,16 +69,17 @@ const TouchPan = () => {
   useEffect(() => {
     if (!isEmpty(userData)) {
         setCurrentEnergy(userData.currentEnergy);
+        setTotalEnergy(userData.energyLimit);
         setCoin(userData.tokens);
     }
   }, [userData]);
 
   useEffect(() => {
-      if (!isEmpty(levelData)) {
-          setTotalEnergy(levelData.tapBalanceRequired);
-          setTapLimit(levelData.tapLimit);
-      }
-  }, [levelData]);
+    console.log("Activity", activityData.tapLimit);
+    if (!isEmpty(activityData)) {
+        setTapLimit(() => activityData.tapLimit);
+    }
+  }, [activityData]);
 
   const updatelevel = () => {
       dispatch(updateUser({level: level + 1}));
@@ -97,7 +99,7 @@ const TouchPan = () => {
 
     setTapped(prev => prev + tapSpeed);
     setTapLimit(prev => prev - tapSpeed);
-
+    dispatch(updateActivity({tapLimit: tapLimit-tapSpeed}));
     if (currentEnergy < totalEnergy) {
       setCurrentEnergy(prev => prev + tapSpeed);
       console.log("Current energy", currentEnergy);
@@ -202,14 +204,6 @@ const TouchPan = () => {
           <Progress value={(currentEnergy / totalEnergy) * 100} className="bg-gray-500" color='green'/>
         </div>
 
-        {/* <Button 
-          className="w-full mb-4 flex gap-3 justify-center items-center text-[16px] border" 
-          color={coin >= levelData.tapBalanceRequired ? "yellow" : "gray"} 
-          onClick={updatelevel}
-          disabled={level > 6 || coin < levelData.tapBalanceRequired}
-        >
-          Level Up <PiArrowFatLinesUpFill size={18} className='text-[#000000] text-btn4'/> {levelData.tapBalanceRequired}
-        </Button> */}
         {milestoneData.map((item, idx)=>{
           return(
             <div key={idx} className='flex justify-between px-4 border rounded-lg py-2 mb-4'>
@@ -231,9 +225,27 @@ const TouchPan = () => {
             </div>
           )
         })}
+        {activityData.continueDate !=0 ?
+          <div className='flex justify-between px-4 border rounded-lg py-2 mb-4'>
+            <div className='flex gap-2 items-center'>
+              <img src="/assets/img/daily.png" alt='weapon' className="w-[40px] h-[40px]"/>
+              <p className='text-white font-extrabold text-[14px]'>{activityData.continueDate + 1} days Login</p>
+            </div>
+            <Button color='green' className='flex gap-1 items-center'>
+              <img 
+                  src="/assets/img/loader.webp"
+                  alt='coin' 
+                  width="20px"
+                  height="20px"
+              />
+              <p className='text-white text-[16px]'>+ {(activityData.continueDate+1)*10}</p>
+            </Button>
+          </div>:
+          <></>
+        }
         
         <div className='flex justify-between p-2'>
-          <div className='flex flex-col cursor-pointer' onClick={()=> onFight()}>
+          <div className='flex flex-col pl-5 cursor-pointer' onClick={()=> onFight()}>
             <img src="/assets/img/fight.png" alt='tap' className="w-[40px] h-[60px] block"/>
             <p className='font-bold mt-1'>Fight</p>
           </div>

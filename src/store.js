@@ -6,6 +6,7 @@ import mineReducer from './reducers/mine';
 import milestoneReducer from './reducers/milestone';
 import characterReducer from './reducers/character';
 import OtherReducer from './reducers/other';
+import ActivityReducer from './reducers/activity';
 
 const reducer = combineReducers({
 	earn: earnReducer,
@@ -14,6 +15,7 @@ const reducer = combineReducers({
 	milestone: milestoneReducer,
 	character: characterReducer,
 	other: OtherReducer,
+	activity: ActivityReducer,
 });
 
 const initialState = {

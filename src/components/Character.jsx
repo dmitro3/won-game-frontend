@@ -70,7 +70,7 @@ const Character = ({ onItemSelect }) => {
                                 isLock ? 
                                     <Button className="py-1 px-2 text-sm" color="green" 
                                         onClick={() => onItemSelect(character)}>Unlock</Button> : 
-                                    <PiCheckFatFill size={36} className='text-[green] text-btn4'/>
+                                    <PiCheckFatFill size={28} className='text-[green] text-btn4 mx-auto'/>
                             }
                         </div>
                     </div>
