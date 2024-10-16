@@ -1,0 +1,4 @@
+export const LOAD_MONSTERS = 'LOAD_MONSTERS';
+export const SHOW_PAYMENT = 'SHOW_PAYMENT';
+export const SET_RANKING = 'SET_RANKING';
+export const SET_TARGET_MONSTER = 'SET_TARGET_MONSTER';
