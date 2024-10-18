@@ -300,7 +300,7 @@ const Challenge = () => {
                     <div className="bg-blue-gray-500top-0 left-0 z-40 p-2">
                         <div className="flex flex-center justify-between items-center mt-[20px] px-3">
                             <div className="flex flex-col justify-start border-2 border-blue-500 py-4 px-2 rounded-lg bg-[#6CF47F66]">
-                                <img src={mine ? mine.avatar : "/assets/character/man1.png"} alt='avatar' 
+                                <img src={mine && mine.avatar ? mine.avatar : "/assets/character/man1.png"} alt='avatar' 
                                     className="w-[120px] h-[160px] mx-auto"/>
                                 <div className="flex gap-2 items-center mt-5">
                                     <img src="/assets/img/heart.png" alt='avatar' className="w-[22px] h-[22px]"/>
@@ -355,7 +355,7 @@ const Challenge = () => {
                     <div className="flex justify-between items-center">
                         <div className="p-2 w-full">
                             <div className="flex justify-between px-3">
-                                <img src={mine ? mine.avatar : "/assets/character/man1.png"} alt='avatar' className="w-[32px] h-[40px]"/>
+                                <img src={mine && mine.avatar ? mine.avatar : "/assets/character/man1.png"} alt='avatar' className="w-[32px] h-[40px]"/>
                                 <div>
                                     <div className='flex gap-1 items-center justify-end'>
                                         <img 
@@ -475,8 +475,8 @@ const Challenge = () => {
                                 left: "0px",
                                 bottom: '-10px',
                             }}/>
-                            {manSparks.map((spark) => (
-                                <img src='/assets/challenge/man_spark4.png' alt='character' className="w-[20px] h-[20px] block" style={{
+                            {manSparks.map((spark, key) => (
+                                <img key={key} src='/assets/challenge/man_spark4.png' alt='character' className="w-[20px] h-[20px] block" style={{
                                     position: 'absolute',
                                     left: `${spark.position}px`,
                                     bottom: '40px',
@@ -489,8 +489,8 @@ const Challenge = () => {
                                 left: "300px",
                                 bottom: '-10px',
                             }}/>
-                            {monsterSparks.map((spark) => (
-                                <img src='/assets/challenge/mon_spark.png' alt='character' className="w-[20px] h-[20px] block" style={{
+                            {monsterSparks.map((spark, key) => (
+                                <img key={key} src='/assets/challenge/mon_spark.png' alt='character' className="w-[20px] h-[20px] block" style={{
                                     position: 'absolute',
                                     left: `${spark.position}px`,
                                     bottom: '53px',
