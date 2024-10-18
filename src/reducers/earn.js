@@ -2,7 +2,7 @@ import { UPDATE_USER, VIEW_USER } from '../constants/earnConstants';
 
 const initialState = {
 	user: {},
-	level: [],
+	level: {},
 };
 
 const earnReducer = (state = initialState, action) => {
@@ -16,6 +16,7 @@ const earnReducer = (state = initialState, action) => {
 				level: payload.level
 			};
 		case UPDATE_USER:
+			console.log("updated---", payload.level);
 			return {
 				...state,
 				user: payload.data,

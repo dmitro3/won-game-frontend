@@ -10,13 +10,13 @@ import Splash from './pages/Splash';
 import Home from "./pages/Home";
 import Shop from "./pages/Shop";
 import Earn from "./pages/Earn";
-import Tasks from "./pages/Tasks";
 import Settings from "./pages/Settings";
 import Mine from "./pages/Mine";
 import Challenge from "./pages/Challenge";
 import Leaderboards from "./pages/Leaderboards";
 import Tournament from "./pages/Tournament";
 import BuyToken from "./pages/BuyToken";
+import { TonConnectUIProvider } from "@tonconnect/ui-react";
 
 const router = createBrowserRouter([
     {
@@ -32,10 +32,6 @@ const router = createBrowserRouter([
             {
                 path:"/home",
                 element: <Earn />,
-            },
-            {
-                path:"/home/tasks",
-                element: <Tasks />,
             },
             {
                 path:"/home/buytoken",
@@ -71,7 +67,11 @@ const router = createBrowserRouter([
   
   
 function App() {
-    return (<RouterProvider router={router} />);
+    return (
+        <TonConnectUIProvider manifestUrl="https://localhost:5173/tonconnect-manifest.json" >
+            <RouterProvider router={router} />
+        </TonConnectUIProvider>
+    );
 }
 
 export default App;

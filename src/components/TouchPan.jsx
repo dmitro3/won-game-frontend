@@ -1,12 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Progress, Button } from "@material-tailwind/react";
-import { PiHandTap, PiCheckFatFill } from 'react-icons/pi';
+import { Progress, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Typography } from "@material-tailwind/react";
+import Milestones from "./Milestones";
 import styled, { keyframes } from "styled-components";
 import { useDispatch, useSelector } from 'react-redux';
 import { viewUser, updateUser } from '../actions/earn';
 import { viewActivity, updateActivity } from '../actions/activity';
 import { showPayment, getChallenge } from '../actions/other';
-import { viewMilestones, updateMilestone } from '../actions/milestone';
 import { useNavigate } from 'react-router-dom';
 import { isSafeValue } from '../utils';
 
@@ -25,39 +24,39 @@ const SlideUpText = styled.div`
     position: absolute;
     animation: ${slideUp} 3s ease-out;
     font-size: 2.1em;
-    color: #ffffffa6;
+    color: #FFFC12a6;
     font-weight: 600;
     left: ${({ x }) => x}px;
     top: ${({ y }) => y}px;
     pointer-events: none; /* To prevent any interaction */
 `;
 
-const saveFlag = false;
-
 const TouchPan = () => {
-  // Default image URL
   const [coin, setCoin] = useState(0);
   const [tapped, setTapped] = useState(0);
   const [level, setLevel] = useState(0);
   const [tapLimit, setTapLimit] = useState(0);
-  const [tapSpeed, setTapSpeed] = useState(1);
+  const [tapSpeed, setTapSpeed] = useState(0);
   const [currentEnergy, setCurrentEnergy] = useState(0);
   const [totalEnergy, setTotalEnergy] = useState(0);
+  const [prev, setPrev] = useState([]);
+  const [next, setNext] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [rewardOpen, setRewardOpen] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false);
   const [clicks, setClicks] = useState([]);
-  const defaultImage = '/assets/img/user/male-2.webp'; // Replace with your default image URL
   const imageRef = useRef(null);
   const dispatch = useDispatch();
   const userData = useSelector((state) => state.earn.user);
   const activityData = useSelector((state)=> state.activity.activity);
-  const milestoneData = useSelector((state) => state.milestone.milestones);
+  const levelData = useSelector((state)=> state.earn.level);
   const nav = useNavigate();
   
   useEffect(() => {
-      dispatch(viewMilestones());
       dispatch(viewUser());
       dispatch(viewActivity());
   },[]);
-
+  console.log("levelData---", levelData);
   const isEmpty = (val) => {
     if (!val) return true;
     if (Object.keys(val).length > 0) return false;
@@ -69,42 +68,56 @@ const TouchPan = () => {
   useEffect(() => {
     if (!isEmpty(userData)) {
         setCurrentEnergy(userData.currentEnergy);
-        setTotalEnergy(userData.energyLimit);
         setCoin(userData.tokens);
     }
   }, [userData]);
 
   useEffect(() => {
-    console.log("Activity", activityData.tapLimit);
+    if (!isEmpty(levelData)) {
+        setLevel(levelData[0].levelIndex);
+        setTotalEnergy(levelData[0].energy);
+        setTapSpeed(levelData[0].tapSpeed);
+        setPrev(levelData[0]);
+        setNext(levelData[1]);
+    }
+  }, [levelData]);
+
+  useEffect(() => {
     if (!isEmpty(activityData)) {
         setTapLimit(() => activityData.tapLimit);
     }
   }, [activityData]);
 
   const updatelevel = () => {
-      dispatch(updateUser({level: level + 1}));
-      setLevel(level + 1);
-      setTotalEnergy(level.tapBalanceRequired);
-      setTapLimit( userData.tapLimit);
-      setImgUrl(userData.icon);
+    if(next.tapBalanceRequired > userData.tokens) {
+      handleShowPayment();
+    }
+    else {
+      console.log(next.levelIndex);
+      setCoin((val)=> val-next.tapBalanceRequired);
+      dispatch(updateUser({levelIndex: next.levelIndex, tokens: coin - next.tapBalanceRequired, energyLimit: next.energy}));
+      dispatch(updateActivity({tapLimit: next.tapLimit}));
+    }
+    handleOpen();
   }
 
-  const handleMilestoneClick = (id) => {
-    console.log('Selected item id:', id); // You can see the clicked item's ID in the console
-    dispatch(updateMilestone({id: id}));
+  const handleOpen = () => setOpen((cur) => !cur);
+  const handleAlertOpen = () => setAlertOpen((cur) => !cur);
+  const handleRewardOpen = () => {
+    setRewardOpen((cur) => !cur);
   }
 
   const handleClick = (e) => {
     if (tapLimit <= 0) return;
-
+    console.log("tapSpeed---", tapSpeed);
     setTapped(prev => prev + tapSpeed);
     setTapLimit(prev => prev - tapSpeed);
-    dispatch(updateActivity({tapLimit: tapLimit-tapSpeed}));
+    dispatch(updateActivity({tapLimit: tapLimit - tapSpeed}));
     if (currentEnergy < totalEnergy) {
       setCurrentEnergy(prev => prev + tapSpeed);
-      console.log("Current energy", currentEnergy);
       dispatch(updateUser({
         currentEnergy: currentEnergy + tapSpeed,
+        levelIndex: level
       }));
     }
     
@@ -139,8 +152,8 @@ const TouchPan = () => {
     const rect = e.target.getBoundingClientRect();
     const newClick = {
         id: Date.now(), // Unique identifier
-        x: e.clientX - (rect.left/2),
-        y: e.clientY,
+        x: e.clientX - (rect.left),
+        y: e.clientY - (rect.bottom/4*3),
     };
     setClicks((prevClicks) => [...prevClicks, newClick]);
     // Remove the click after the animation duration
@@ -152,123 +165,143 @@ const TouchPan = () => {
   };
 
   const onFight = () => {
-    console.log("User Challenge", userData.lastChallenge);
-    dispatch(getChallenge(isSafeValue(userData.lastChallenge, 1)));
-    nav('/home/challenge');
+    if(currentEnergy == 0) handleAlertOpen();
+    else {
+      dispatch(getChallenge(isSafeValue(userData.lastChallenge, 1)));
+      nav('/home/challenge');
+    }
   }
 
   const onTournament = () => {
-    nav('/home/tournament');
+    if(currentEnergy == 0) handleAlertOpen();
+    else nav('/home/tournament');
   }
 
   const handleShowPayment = () => {
-    console.log("Show");
     dispatch(showPayment(true));
   }
 
   return (
-    <div className="max-w-sm mx-auto bg-gray-900 text-white p-6 rounded-lg shadow-lg">
+    <div className="max-w-sm mx-auto bg-[#69423E] text-white p-6 rounded-lg shadow-lg">
       {/* User Info */}
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-4">
-          <div className="bg-blue-500 rounded-full p-2 w-14 h-14 flex items-center justify-center">
-            <img 
-              src={defaultImage} 
-              alt='Default User'
-              className='w-[36px] h-[48px]' 
-            />
-          </div>
-          <div>
-            <h2 className="text-lg font-semibold">{userData.name}</h2>
-            {/* <p>Knight</p> */}
+        <div className='flex gap-2'>
+          <img src='/assets/img/user/male-2.webp' alt='Default User' className='w-[44px] h-[48px] border rounded-lg p-1 bg-blue-gray-600' />
+          <div className='flex flex-col'>
+            <p className="text-lg font-semibold">{userData.name}</p>
+            <p className="text-md font-semibold text-yellow-500">Lv.{userData.levelIndex}</p>
           </div>
         </div>
-        <div className='flex gap-2 items-center'>
-          <img 
-            src="/assets/img/loader.webp"
-            alt='coin' 
-            width="30px"
-            height="30px"
-          />
-          <p className='text-white text-lg'>{userData.tokens}</p> 
-          <Button color='green' size='sm' onClick={handleShowPayment}>+</Button>
+        <div className='flex flex-col gap-1 items-end w-[65%] relative'>
+          <div className='flex gap-2 items-center'>
+            <img src="/assets/img/loader.webp" alt='coin' width="30px" height="30px" />
+            <p className='text-white text-lg'>{coin}</p> 
+            <div className="border rounded-lg px-2 bg-brown-900 hover:bg-green-700 font-bold text-yellow-400 hover:text-white cursor-pointer" onClick={handleShowPayment}>+</div>
+          </div>
+          <Progress value={(currentEnergy / totalEnergy) * 100} className="bg-gray-500" size="lg" color='red' />
+          <p className='absolute bottom-[-8%] left-[10%] text-[14px]'>{currentEnergy} / {totalEnergy}</p>
+          <Dialog size="xs" open={open} className="bg-[#F47E5777]">
+            <DialogHeader className="justify-between">
+                <Typography variant="h4" color="white">
+                  Upgrade Level
+                </Typography>
+                <div className='flex justify-center gap-3 items-center'>
+                    <img src="/assets/img/loader.webp" alt='coin' width="24px" height="24px" />
+                    <p className='text-yellow-600 text-[24px]'>{userData.tokens}</p>
+                </div>
+            </DialogHeader>
+            <DialogBody className="justify-center">
+              <div className='flex gap-5 justify-center px-[20%] items-center mb-5 mt-5'>
+                <div className='rounded-lg flex flex-col'>
+                    <div className='bg-blue-900 py-1 px-2 text-[24px] text-white text-center'>Lv.{prev.levelIndex}</div>
+                    <div className='flex flex-col justify-center p-2 bg-blue-400 lg:px-8 sm:px-1'>
+                        <div className='flex justify-center gap-3 rounded-full bg-blue-gray-700 px-4 py-2 mb-2 items-center'>
+                            <img src="/assets/img/heart.png" alt='coin' width="14px" height="14px" />
+                            <p className='text-white text-[16px]'>{prev.energy}</p>
+                        </div>
+                        <div className='flex justify-center gap-3 rounded-full bg-blue-gray-700 px-4 py-2 mb-2 items-center'>
+                            <img src="/assets/img/loader.webp" alt='coin' width="14px" height="14px" />
+                            <p className='text-white text-[16px]'>{prev.tapLimit}</p>
+                        </div>
+                        <div className='flex justify-center gap-3 rounded-full bg-blue-gray-700 px-4 py-2 mb-2 items-center'>
+                            <img src="/assets/img/speed.png" alt='coin' width="14px" height="14px" />
+                            <p className='text-white text-[16px]'>{prev.tapSpeed}</p>
+                        </div>
+                    </div>
+                </div>
+                <img src="/assets/img/arrow.png" alt="arrow" className='md:w-[32px] xs:w-[16px] h-[16px]' />
+                <div className='rounded-lg flex flex-col'>
+                    <div className='bg-red-900 py-1 px-2 text-[24px] text-white text-center'>Lv.{next.levelIndex}</div>
+                    <div className='flex flex-col justify-center p-2 bg-red-400 lg:px-8 sm:px-1'>
+                        <div className='flex justify-center gap-3 rounded-full bg-blue-gray-700 px-4 py-2 mb-2 items-center'>
+                            <img src="/assets/img/heart.png" alt='coin' width="14px" height="14px" />
+                            <p className='text-white text-[16px]'>{next.energy}</p>
+                        </div>
+                        <div className='flex justify-center gap-3 rounded-full bg-blue-gray-700 px-4 py-2 mb-2 items-center'>
+                            <img src="/assets/img/loader.webp" alt='coin' width="14px" height="14px" />
+                            <p className='text-white text-[16px]'>{next.tapLimit}</p>
+                        </div>
+                        <div className='flex justify-center gap-3 rounded-full bg-blue-gray-700 px-4 py-2 mb-2 items-center'>
+                            <img src="/assets/img/speed.png" alt='coin' width="14px" height="14px" />
+                            <p className='text-white text-[16px]'>{next.tapSpeed}</p>
+                        </div>
+                    </div>
+                </div>
+              </div>
+            </DialogBody>
+            <DialogFooter className="justify-center gap-10 ">
+              <Button color='green' onClick={updatelevel} disabled={prev.levelIndex == 6}>
+                <p className='text-yellow-500 font-bold text-[14px] mb-1'>Level Up</p>
+                <div className='flex justify-center gap-2'>
+                  <img src="/assets/img/loader.webp" alt='coin' width="16px" height="16px" />
+                  <p className='text-yellow-500 font-bold text-[16px]'>{next.tapBalanceRequired}</p>
+                </div>
+              </Button>
+              <Button onClick={handleOpen} className='py-5 px-8 text-[14px]'>Cancel</Button>
+            </DialogFooter>
+          </Dialog>
         </div>
       </div>
-
-      <div className='mt-4'>
-        {/* Taps Left Button */}
-        
-
-        <div className="w-full mb-4">
-          <p className="mb-1">Energy : {currentEnergy} / {totalEnergy} </p>
-          <Progress value={(currentEnergy / totalEnergy) * 100} className="bg-gray-500" color='green'/>
-        </div>
-
-        {milestoneData.map((item, idx)=>{
-          return(
-            <div key={idx} className='flex justify-between px-4 border rounded-lg py-2 mb-4'>
-              <div className='flex gap-2 items-center'>
-                <img src={item.imgSrc} alt='weapon' className="w-[40px] h-[40px]"/>
-                <p className='text-white font-extrabold text-[14px]'>{item.title}</p>
-              </div>
-              {!item.isReceived ?
-              <Button color='green' className='flex gap-1 items-center' disabled={item.isFailed}>
-                <img 
-                    src="/assets/img/loader.webp"
-                    alt='coin' 
-                    width="20px"
-                    height="20px"
-                />
-                <p className='text-white text-[16px]'>+{item.reward}</p>
-              </Button>:
-              <PiCheckFatFill size={36} className='text-[green] text-btn4'/>}
-            </div>
-          )
-        })}
-        {activityData.continueDate !=0 ?
-          <div className='flex justify-between px-4 border rounded-lg py-2 mb-4'>
-            <div className='flex gap-2 items-center'>
-              <img src="/assets/img/daily.png" alt='weapon' className="w-[40px] h-[40px]"/>
-              <p className='text-white font-extrabold text-[14px]'>{activityData.continueDate + 1} days Login</p>
-            </div>
-            <Button color='green' className='flex gap-1 items-center'>
-              <img 
-                  src="/assets/img/loader.webp"
-                  alt='coin' 
-                  width="20px"
-                  height="20px"
-              />
-              <p className='text-white text-[16px]'>+ {(activityData.continueDate+1)*10}</p>
-            </Button>
-          </div>:
-          <></>
-        }
+      <div className='mt-6'>
+        <Dialog size="sm" open={rewardOpen} className="bg-[#F47E5777] px-4">
+          <Milestones />
+          <Button onClick={handleRewardOpen} className='text-[16px] flex mx-auto mb-3 sm:px-4 sm:py-2 px-2 py-1' color="blue">Close</Button>
+        </Dialog>
         
         <div className='flex justify-between p-2'>
           <div className='flex flex-col pl-5 cursor-pointer' onClick={()=> onFight()}>
-            <img src="/assets/img/fight.png" alt='tap' className="w-[40px] h-[60px] block"/>
+            <img src="/assets/img/fight.png" alt='tap' className="w-[100px] h-[120px] block"/>
             <p className='font-bold mt-1'>Fight</p>
           </div>
           <div className='flex flex-col cursor-pointer' onClick={()=> onTournament()}>
-            <img src="/assets/img/tournament.png" alt='tap' className="w-[40px] h-[60px] block mx-auto "/>
+            <img src="/assets/img/tournament1.png" alt='tap' className="w-[100px] h-[120px] block mx-auto"/>
             <p className='font-bold mt-1 text-center'>Tournament</p>
           </div>
         </div>
 
-        <div className="flex flex-col justify-center items-center mt-[-30px] mb-2">
-              <div className="flex justify-center">
-                  <img src={userData.icon ?? "/assets/img/bronze.webp"} alt='tap' onPointerDown={handleClick} ref={imageRef} className="w-[100px] h-[100px] block cursor-pointer"/>
-                  {clicks.map((click) => (
-                      <SlideUpText key={click.id} x={click.x} y={click.y}>
-                      +{tapSpeed}
-                      </SlideUpText>
-                  ))}
-              </div>
-              <p className="text-center text-xl font-bold"> {tapped} Clicks</p>
-        </div>
+        <Dialog size="sm" open={alertOpen} className="bg-[#F47E5777] px-4">
+          <p className='text-[24px] text-white font-bold text-center mt-5 mb-5'>You should increase your energy!</p>
+          <Button onClick={handleAlertOpen} className='text-[16px] flex mx-auto mb-3 sm:px-4 sm:py-2 px-2 py-1' color="blue">Close</Button>
+        </Dialog>
 
-        <div className="flex justify-center w-full mb-4 rounded-md py-1 bg-teal-500 gap-2 items-center">
-          { tapLimit } Taps Limit<PiHandTap size={18} className='text-[#ffffff] text-btn4'/>
+        <div className="flex flex-col justify-center items-center mt-[20px] mb-2">
+          <div className="flex justify-center relative">
+              <img src={userData.icon ?? "/assets/img/tap.png"} alt='tap' onPointerDown={handleClick} ref={imageRef} className="w-[240px] h-[220px] block cursor-pointer"/>
+              {clicks.map((click) => (
+                  <SlideUpText key={click.id} x={click.x} y={click.y}>
+                  +{tapSpeed}
+                  </SlideUpText>
+              ))}
+          </div>
+          <div className='flex mt-1'>
+            <p className="text-center text-xl font-bold border bg-green-700 rounded-lg px-2 py-1"> {tapped} Clicks</p>
+            <p className='border bg-blue-800 px-2 py-1 rounded-lg text-[18px]'>{ tapLimit } Taps Limit</p>
+          </div>
+          <div className='flex justify-between w-full px-1'>
+            <img src="/assets/img/reward.png" alt='Default User' className='w-[60px] h-[72px] cursor-pointer mt-[-100px]' onClick={handleRewardOpen}/>
+            <img src="/assets/img/levelup.png" alt='Default User' className='w-[60px] h-[72px] cursor-pointer mt-[-100px]' onClick={handleOpen}/>
+          </div>
+          
         </div>
       </div>
     </div>

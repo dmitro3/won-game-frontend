@@ -23,6 +23,7 @@ export const viewUser = () => async dispatch => {
 };
 
 export const updateUser = (userData) => async dispatch => {
+  console.log("userdata123", userData);
   try {
     const res = await axios.put(`${serverUrl}/user/${telegramId}`, userData);
     dispatch({

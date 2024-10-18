@@ -13,7 +13,6 @@ const Home = () => {
     const showPay = useSelector((state) => state.other.showPayment);
 
     useEffect(() => {
-        console.log("Show Payment Updated", showPay);
         dispatch(viewUser());
     }, [showPay]);
 

@@ -37,7 +37,7 @@ const Footer = () => {
         {
             title: "Earn",
             link: "/home",
-            icon: 1 ? (<><PiHandTapFill size={20} className={location.pathname === "/home" ? "w-[26px] h-[26px]" : ""} /></>) : (<><img id={selectedExchange.id} src={selectedExchange.icon} alt="selected" className="w-[26px]"/></>)
+            icon: <PiHandTapFill size={20} className={location.pathname === "/home" ? "w-[26px] h-[26px]" : ""} />
         },
         {
             title: "Shop",

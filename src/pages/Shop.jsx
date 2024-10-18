@@ -29,7 +29,7 @@ const Shop = () => {
             dispatch(viewAll());
         }));
 
-        dispatch(updateUser({tokens: userData.tokens - item.price}));
+        dispatch(updateUser({tokens: userData.tokens - item.price, levelIndex: userData.levelIndex}));
     }
 
     const handleCharacterClick = (item) => {
@@ -42,22 +42,22 @@ const Shop = () => {
             dispatch(viewAll());
         }));
 
-        dispatch(updateUser({tokens: userData.tokens - item.price}));
+        dispatch(updateUser({tokens: userData.tokens - item.price, levelIndex: userData.levelIndex}));
     }
 
     return (
         <Animate>
-            <div className="max-w-sm mx-auto bg-gray-900 text-white p-6 rounded-lg shadow-lg h-full overflow-y-auto">
-                <div className="flex flex-col pt-3 space-y-3 w-full">
+            <div className="max-w-sm mx-auto bg-[#69423E] text-white p-6 rounded-lg shadow-lg h-full overflow-y-auto">
+                {/* <div className="flex flex-col pt-3 space-y-3 w-full"> */}
                     <div className='flex justify-between px-5'>
                         <div className='flex gap-2 items-center'>
-                        <img 
-                            src="/assets/img/loader.webp"
-                            alt='coin' 
-                            width="30px"
-                            height="30px"
-                        />
-                        <p className='text-white text-lg'>{userData.tokens}</p>
+                            <img 
+                                src="/assets/img/loader.webp"
+                                alt='coin' 
+                                width="30px"
+                                height="30px"
+                            />
+                            <p className='text-white text-lg'>{userData.tokens}</p>
                         </div>
                         <div>
                             <img src="/assets/shop/shop.png" alt="logo" className="w-[80px] h-[80px]"/>
@@ -67,7 +67,7 @@ const Shop = () => {
                         <Charater onItemSelect={handleCharacterClick}/>
                         <ShopItem onItemSelect={handleItemClick}/>
                     </div>
-                </div>
+                {/* </div> */}
             </div>
         </Animate>
     );

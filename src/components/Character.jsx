@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Button } from "@material-tailwind/react";
 import { PiCheckFatFill } from 'react-icons/pi';
 import { useDispatch, useSelector } from 'react-redux';
@@ -14,7 +14,7 @@ const Character = ({ onItemSelect }) => {
     },[]);
 
     return (
-        <div className="grid grid-cols-2 gap-4 p-4 border-b-2">
+        <div className="grid grid-cols-2 gap-4 p-4 border-b-2 ">
         {
             characters.map((character) => {
 
@@ -27,20 +27,20 @@ const Character = ({ onItemSelect }) => {
                         <img src={character.imageSrc} alt={character.imageAlt} className='w-full h-full'/>
                         <div className='absolute bottom-[-5%] border bg-blue-gray-900 w-full'>
                             <div className='flex px-2 justify-between mb-1'>
-                                <div className='flex gap-2'>
+                                <div className='flex gap-2 items-center'>
                                     <img 
-                                        src="/assets/challenge/attack.png"
+                                        src="/assets/img/heart.png"
                                         alt='coin' 
                                         width="14px"
                                         height="14px"
                                     />
                                     <p className='text-white text-[12px]'>{character.energy}</p>
                                 </div>
-                                <div className='flex gap-2'>
+                                <div className='flex gap-1'>
                                     <img 
                                         src="/assets/img/loader.webp"
                                         alt='coin' 
-                                        width="14px"
+                                        width="18px"
                                         height="14px"
                                     />
                                     <p className='text-white text-[12px]'>{character.price}</p>

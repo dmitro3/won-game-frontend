@@ -49,7 +49,7 @@ const Mine = () => {
 
     return (
         <Animate>
-            <div className="max-w-sm mx-auto bg-gray-900 text-white p-6 rounded-lg shadow-lg h-full overflow-y-auto">
+            <div className="max-w-sm mx-auto bg-[#69423E] text-white p-6 rounded-lg shadow-lg h-full overflow-y-auto">
 
                 <div className='flex justify-center'>
                     <MineCharacter character={character} armor={attack} shield={shield} />
@@ -57,8 +57,8 @@ const Mine = () => {
 
                 <ButtonGroup className="gap-2 flex justify-center" fullWidth color="green">
                     <Button className="text-center" onClick={() => handleSelect('character')}>Character</Button>
-                    <Button className="" onClick={() => handleSelect('attack')}>Attack</Button>
-                    <Button className="" onClick={() => handleSelect('defence')}>Defence</Button>
+                    <Button className="text-center" onClick={() => handleSelect('attack')}>Attack</Button>
+                    <Button className="text-center" onClick={() => handleSelect('defence')}>Defence</Button>
                 </ButtonGroup>
 
                 <div className="flex flex-col mt-3 space-y-3 w-full h-[240px] overflow-y-auto scrollbar-hide">

@@ -30,7 +30,7 @@ const Tournament = () => {
     
     return (
         <Animate>
-            <div className="max-w-sm mx-auto bg-gray-900 text-white p-6 rounded-lg shadow-lg h-full overflow-y-auto">
+            <div className="max-w-sm mx-auto bg-[#69423E] text-white p-6 rounded-lg shadow-lg h-full overflow-y-auto">
 
                 <Typography variant="h3" color="white" className="text-center font-bold mb-6">
                     Tournament
