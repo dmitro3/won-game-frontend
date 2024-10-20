@@ -10,6 +10,7 @@ import {
 export const viewAll = () => async dispatch => {
   try {
     const res = await axios.get(`${serverUrl}/mine/${telegramId}`);
+    console.log("Mine Data", res);
     dispatch({
       type: VIEW_ALL,
       payload: res.data
@@ -22,6 +23,7 @@ export const viewAll = () => async dispatch => {
 export const viewByType = (userData) => async dispatch => {
   try {
     const res = await axios.post(`${serverUrl}/mine/`, {type: userData.type});
+    console.log("Mine Data By Type", res);
     dispatch({
       type: VIEW_BY_TYPE,
       payload: res.data
@@ -38,6 +40,7 @@ export const viewItem = (userData) => async dispatch => {
       name: username,
       id: userData.id,
     });
+    console.log("Mine Data View By ID", res);
     
     dispatch({
       type: VIEW_ITEM,
@@ -52,7 +55,7 @@ export const viewItem = (userData) => async dispatch => {
 export const getItem = () => async dispatch => {
   try {
     const res = await axios.get(`${serverUrl}/mine/`);
-    
+    console.log("Mine Data Get Item", res);    
     dispatch({
       type: GET_ITEM,
       payload: res.data
@@ -70,6 +73,7 @@ export const wearItem = (userData) => async dispatch => {
       id: userData.id,
       type: userData.type
     });
+    console.log("Mine Data Wear Item", res);
     
     dispatch({
       type: WEAR_ITEM,

@@ -13,6 +13,7 @@ import {
 export const viewUser = () => async dispatch => {
   try {
     const res = await axios.post(`${serverUrl}/user/${telegramId}`, {name: username});
+    console.log("User Data", res);
     dispatch({
       type: VIEW_USER,
       payload: res.data
@@ -23,7 +24,7 @@ export const viewUser = () => async dispatch => {
 };
 
 export const updateUser = (userData) => async dispatch => {
-  console.log("userdata123", userData);
+  console.log("Update User", userData);
   try {
     const res = await axios.put(`${serverUrl}/user/${telegramId}`, userData);
     dispatch({
