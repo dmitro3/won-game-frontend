@@ -17,6 +17,8 @@ const Challenge = () => {
     const [open, setOpen] = React.useState(false);
     const [mine, setMine] = useState(null);
     const [monster, setMonster] = useState(null);
+    const [wins, setWins] = useState(0);
+    const [earned, setEarned] = useState(0);
     const [battleTime, setBattleTime] = useState(0);
     const [manSparks, setManSparks] = useState([]);
     const [monsterSparks, setMonsterSparks] = useState([]);
@@ -68,7 +70,9 @@ const Challenge = () => {
             currentEnergy: mine.curHealth,
             tokens: mine.tokens + monster.tokenEarns,
             lastChallenge: monster.challengeIndex + 1,
-            levelIndex: userData.levelIndex
+            levelIndex: userData.levelIndex,
+            pointsBalance: wins + 1,
+            tokensEarned: earned + monster.tokenEarns,
         }));
         setOpen((cur) => !cur);
         nav('/home');
@@ -91,6 +95,13 @@ const Challenge = () => {
             setTapLimit(() => activityData.tapLimit);
         }
     }, [activityData]);
+
+    useEffect(() => {
+        if (!isEmpty(userData)) {
+            setWins(userData.pointsBalance);
+            setEarned(userData.tokensEarned);
+        }
+    }, [userData]);
 
     useEffect(() => {
         let equipped = mineData.filter((item) => item.isWear);
@@ -133,7 +144,7 @@ const Challenge = () => {
         // Monster shoots a spark every 3 seconds
         monsterInterval = setInterval(() => {
             shootMonsterSpark();
-        }, 3000);
+        }, 4000);
     
         // Update game timer every second
         timerInterval = setInterval(() => {
@@ -179,10 +190,10 @@ const Challenge = () => {
 
     const doFightAction = () => {
         setManSparks((prevSparks) =>
-            prevSparks.map((spark) => ({ ...spark, position: spark.position + 10 }))
+            prevSparks.map((spark) => ({ ...spark, position: spark.position + 20 }))
         );
         setMonsterSparks((prevSparks) =>
-            prevSparks.map((spark) => ({ ...spark, position: spark.position - 10 }))
+            prevSparks.map((spark) => ({ ...spark, position: spark.position - 20 }))
         );
     
         setManSparks((prevSparks) => {
@@ -293,13 +304,13 @@ const Challenge = () => {
     return (
         <Animate>
             
-            <div className="max-w-sm mx-auto bg-[#64ECEE55] bg-fixed text-white rounded-lg shadow-lg h-full overflow-y-auto relative bg-[url('/assets/img/fields/6.png')] bg-contain bg-center bg-no-repeat">
+            <div className="max-w-sm mx-auto bg-[#64ECEE55] bg-fixed text-white h-full overflow-y-auto relative bg-[url('/assets/img/fields/6.png')] bg-contain bg-center bg-no-repeat">
                 {
                 dlgShow && 
                 <div className="w-full h-full p-2 z-10 bg-[#000E] absolute bg-[url('/assets/img/bg_vs.png')] bg-center bg-contain bg-no-repeat">
                     <div className="bg-blue-gray-500top-0 left-0 z-40 p-2">
                         <div className="flex flex-center justify-between items-center mt-[20px] px-3">
-                            <div className="flex flex-col justify-start border-2 border-blue-500 py-4 px-2 rounded-lg bg-[#6CF47F66]">
+                            <div className="flex flex-col justify-start border-[5px] border-blue-500 py-4 px-2 rounded-lg bg-[#6CF47F66]">
                                 <img src={mine ? mine.avatar : "/assets/character/man1.png"} alt='avatar' 
                                     className="w-[120px] h-[160px] mx-auto"/>
                                 <div className="flex gap-2 items-center mt-5">
@@ -320,7 +331,7 @@ const Challenge = () => {
                                 </div>
                             </div>
 
-                            <div className="flex flex-col justify-start border-2 border-red-500 py-4 px-2 rounded-lg bg-[#6CF47F66]">
+                            <div className="flex flex-col justify-start border-[5px] border-red-500 py-4 px-2 rounded-lg bg-[#6CF47F66]">
                                 <img src="/assets/monster/monster1.png" alt='avatar' 
                                     className="w-[120px] h-[160px] mx-auto"/>
                                 <div className="flex gap-2 items-center mt-5">
@@ -475,8 +486,8 @@ const Challenge = () => {
                                 left: "0px",
                                 bottom: '-10px',
                             }}/>
-                            {manSparks.map((spark) => (
-                                <img src='/assets/challenge/man_spark4.png' alt='character' className="w-[20px] h-[20px] block" style={{
+                            {manSparks.map((spark, idx) => (
+                                <img key={idx} src='/assets/challenge/man_spark4.png' alt='character' className="w-[20px] h-[20px] block" style={{
                                     position: 'absolute',
                                     left: `${spark.position}px`,
                                     bottom: '40px',
@@ -489,8 +500,8 @@ const Challenge = () => {
                                 left: "300px",
                                 bottom: '-10px',
                             }}/>
-                            {monsterSparks.map((spark) => (
-                                <img src='/assets/challenge/mon_spark.png' alt='character' className="w-[20px] h-[20px] block" style={{
+                            {monsterSparks.map((spark, idx) => (
+                                <img key={idx} src='/assets/challenge/mon_spark.png' alt='character' className="w-[20px] h-[20px] block" style={{
                                     position: 'absolute',
                                     left: `${spark.position}px`,
                                     bottom: '53px',
@@ -500,15 +511,15 @@ const Challenge = () => {
                     </div>
 
                     <div className="flex gap-5 mt-[60px] pl-4">
-                        <div className="flex flex-col border bg-[#FEDFAE] rounded-lg relative cursor-pointer" onClick={handleAttack} style={{visibility: mine && mine.attackItems == 0 ? "hidden" : "visible"}}>
+                        <div className="flex flex-col border bg-[#b0f3b688] rounded-lg relative cursor-pointer" onClick={handleAttack} style={{visibility: mine && mine.attackItems == 0 ? "hidden" : "visible"}}>
                             <img src="/assets/weapon/weapon8.png" alt='weapon' className="w-[40px] h-[40px] p-[4px]"/>
                             <p className='text-deep-orange-900 font-extrabold text-[16px]'>{mine && mine.attackItems}</p>
                         </div>
-                        <div className="flex flex-col border bg-[#FEDFAE] rounded-lg relative cursor-pointer" onClick={handleDefence} style={{visibility: mine && mine.defenceItems == 0 ? "hidden" : "visible"}}>
+                        <div className="flex flex-col border bg-[#b0f3b688] rounded-lg relative cursor-pointer" onClick={handleDefence} style={{visibility: mine && mine.defenceItems == 0 ? "hidden" : "visible"}}>
                             <img src="/assets/shield/shield6.png" alt='weapon' className="w-w-[40px] h-[40px] p-[4px]"/>
                             <p className='text-deep-orange-900 font-extrabold text-[16px]'>{mine && mine.defenceItems}</p>
                         </div>
-                        <div className="flex flex-col border bg-[#FEDFAE] rounded-lg relative cursor-pointer" onClick={handleEnergy} style={{visibility: mine && mine.lifeItems == 0 ? "hidden" : "visible"}}>
+                        <div className="flex flex-col border bg-[#b0f3b688] rounded-lg relative cursor-pointer" onClick={handleEnergy} style={{visibility: mine && mine.lifeItems == 0 ? "hidden" : "visible"}}>
                             <img src="/assets/img/heart.png" alt='weapon' className="w-[40px] h-[40px] p-[4px]"/>
                             <p className='text-deep-orange-900 font-extrabold text-[16px]'>{mine && mine.lifeItems}</p>
                         </div>

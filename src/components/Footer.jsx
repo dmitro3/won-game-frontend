@@ -52,7 +52,7 @@ const Footer = () => {
     ];
 
     return (
-        <div className="w-full z-30 flex items-center px-[8px] h-[72px] pbd-[2px] justify-center space-x-2 bg-gray-900 border-[#363636] pb-[3px] border-[1px] border-b-[#2c2b2b] rounded-[35px]">
+        <div className="w-full z-30 flex items-center px-[8px] h-[72px] pbd-[2px] justify-center space-x-2 bg-gray-900 pb-[3px] rounded-[35px]">
 
         {
             footerLinks.map((footer, index) => (

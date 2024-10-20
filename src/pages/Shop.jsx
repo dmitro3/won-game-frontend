@@ -47,7 +47,7 @@ const Shop = () => {
 
     return (
         <Animate>
-            <div className="max-w-sm mx-auto bg-[#69423E] text-white p-6 rounded-lg shadow-lg h-full overflow-y-auto">
+            <div className="max-w-sm mx-auto bg-[#69423E] text-white p-6 h-full overflow-y-auto pb-[100px]">
                 {/* <div className="flex flex-col pt-3 space-y-3 w-full"> */}
                     <div className='flex justify-between px-5'>
                         <div className='flex gap-2 items-center'>

@@ -49,17 +49,16 @@ const Mine = () => {
 
     return (
         <Animate>
-            <div className="max-w-sm mx-auto bg-[#69423E] text-white p-6 rounded-lg shadow-lg h-full overflow-y-auto">
+            <div className="max-w-sm mx-auto bg-[#69423E] text-white p-6 h-full overflow-y-auto pb-[100px]">
 
                 <div className='flex justify-center'>
                     <MineCharacter character={character} armor={attack} shield={shield} />
                 </div>
-
-                <ButtonGroup className="gap-2 flex justify-center" fullWidth color="green">
-                    <Button className="text-center" onClick={() => handleSelect('character')}>Character</Button>
-                    <Button className="text-center" onClick={() => handleSelect('attack')}>Attack</Button>
-                    <Button className="text-center" onClick={() => handleSelect('defence')}>Defence</Button>
-                </ButtonGroup>
+                <div className='flex justify-between'>
+                    <img src="/assets/img/character.png" style={{border: type == "character" ? "3px solid" : "none"}} onClick={() => handleSelect('character')} className='cursor-pointer w-[125px] h-[45px]'/>
+                    <img src="/assets/img/attack.png" style={{border: type == "attack" ? "3px solid" : "none"}} onClick={() => handleSelect('attack')} className='cursor-pointer w-[90px] h-[45px]'/>
+                    <img src="/assets/img/defence.png" style={{border: type == "defence" ? "3px solid" : "none"}} onClick={() => handleSelect('defence')} className='cursor-pointer w-[105px] h-[45px]'/>
+                </div>
 
                 <div className="flex flex-col mt-3 space-y-3 w-full h-[240px] overflow-y-auto scrollbar-hide">
                     <MineItem onItemSelect={handleItemClick} type={type}/>

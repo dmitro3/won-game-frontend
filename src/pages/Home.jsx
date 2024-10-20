@@ -17,15 +17,15 @@ const Home = () => {
     }, [showPay]);
 
     return (
-        <div className="w-full h-full flex justify-center pb-[120px]">
+        <div className="w-full h-full flex justify-center">
 
-            <div className="w-full h-[100%]">
+            <div className="w-full h-full overflow-y-auto">
                 <AnimatePresence mode='wait' initial={true}>
                     <Outlet key={location.pathname} />
                 </AnimatePresence>
             </div>
 
-            <div id="footermain" className={`visible z-30 flex flex-col bg-gray-900 fixed bottom-0 py-6 left-0 right-0 justify-center items-center px-3`}>
+            <div id="footermain" className={`visible z-30 flex flex-col bg-[#69423E] fixed bottom-0 left-0 right-0 justify-center items-center pb-5 px-3`}>
                 <Footer />
             </div>
 
