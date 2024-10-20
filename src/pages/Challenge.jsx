@@ -312,7 +312,7 @@ const Challenge = () => {
                     <div className="bg-blue-gray-500top-0 left-0 z-40 p-2">
                         <div className="flex flex-center justify-between items-center mt-[20px] px-3">
                             <div className="flex flex-col justify-start border-[5px] border-blue-500 py-4 px-2 rounded-lg bg-[#6CF47F66]">
-                                <img src={mine ? mine.avatar : "/assets/character/man1.png"} alt='avatar' 
+                                <img src={mine && mine.avatar ? mine.avatar : "/assets/character/man1.png"} alt='avatar' 
                                     className="w-[120px] h-[160px] mx-auto"/>
                                 <div className="flex gap-2 items-center mt-5">
                                     <img src="/assets/img/heart.png" alt='avatar' className="w-[22px] h-[22px]"/>
