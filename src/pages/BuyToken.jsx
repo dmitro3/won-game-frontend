@@ -152,10 +152,9 @@ const BuyToken = ({onSubmit, onClose}) => {
                 </div>
 
                 <div className='flex items-center bg-green justify-end'>
-                    <div className='flex gap-2 items-center border bg-green-800 hover:bg-blue-gray-400 p-1 rounded-md cursor-pointer w-[50px]' 
-                        onClick={handleWallet}>
+                    <button class="bg-[#FFC658] hover:bg-[#FFC658EE] text-[#C94A0C] font-bold py-1 px-2 border-b-[3px] border-r-[3px] border-[#c18f2d] shadow rounded" onClick={handleWallet}>
                         Claim
-                    </div>
+                    </button>
                 </div>
 
                 <div className='mt-4 mb-8 border border-bottom-1 border-[#FFF]'></div>
@@ -180,9 +179,9 @@ const BuyToken = ({onSubmit, onClose}) => {
                                         className="h-[30px] w-[30px]" />
                                     <div>{item.tokenNeeded * itemVal}</div>
                                 </div>
-                                <div className='flex gap-2 items-center border bg-green-800 hover:bg-blue-gray-400 p-1 rounded-md cursor-pointer' onClick={() => claimItems(idx)}>
+                                <button class="bg-[#FFC658] hover:bg-[#FFC658EE] text-[#C94A0C] font-bold py-1 px-2 border-b-[3px] border-r-[3px] border-[#c18f2d] shadow rounded" onClick={() => claimItems(idx)}>
                                     Claim
-                                </div>
+                                </button>
                             </div>
                         );
                     })
@@ -194,10 +193,9 @@ const BuyToken = ({onSubmit, onClose}) => {
                         * Not enough token to buy items.
                     </div>
                 }
-
-                <Button className='mt-10' variant="filled" color='red' onClick={() => onClose()}>
+                <button class="bg-[#FFC658] hover:bg-[#FFC658EE] text-[#C94A0C] font-bold py-1 px-2 border-b-[3px] border-r-[3px] border-[#c18f2d] shadow rounded mt-6" onClick={() => onClose()}>
                     Close
-                </Button>
+                </button>
             </div>
         </Animate>
         

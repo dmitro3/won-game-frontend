@@ -30,9 +30,9 @@ const Leaderboard = () => {
                 <div className='px-[30px]'>
             {/* <div className="max-w-sm mx-auto bg-[#69423E] text-white p-6 rounded-lg shadow-lg h-[100%] overflow-y-auto bg-[url('/assets/img/ranking.png')] bg-contain bg-center bg-no-repeat pt-[22vh] px-[30px]"> */}
                     <div className='flex justify-between mb-4 mt-5'>
-                        <img src="/assets/img/tokens.png" className="w-[90px] h-[30px] cursor-pointer border" style={{border: type == "tokensEarned" ? "3px solid" : "none"}} onClick={() => handleSelect('tokensEarned')}/>
-                        <img src="/assets/img/taps.png" className='w-[90px] h-[30px] cursor-pointer' style={{border: type == "points" ? "3px solid" : "none"}} onClick={() => handleSelect('points')}/>
-                        <img src="/assets/img/battles.png" className='w-[90px] h-[30px] cursor-pointer' style={{border: type == "pointsBalance" ? "3px solid" : "none"}} onClick={() => handleSelect('pointsBalance')}/>
+                        <img src="/assets/img/tokens.png" className="w-[90px] h-[30px] cursor-pointer border" style={{border: type == "tokensEarned" ? "1px solid" : "none"}} onClick={() => handleSelect('tokensEarned')}/>
+                        <img src="/assets/img/taps.png" className='w-[90px] h-[30px] cursor-pointer' style={{border: type == "points" ? "1px solid" : "none"}} onClick={() => handleSelect('points')}/>
+                        <img src="/assets/img/battles.png" className='w-[90px] h-[30px] cursor-pointer' style={{border: type == "pointsBalance" ? "1px solid" : "none"}} onClick={() => handleSelect('pointsBalance')}/>
                     </div>
 
                     {/* Display sorted data */}

@@ -223,7 +223,9 @@ const Earn = () => {
             <p className="text-lg font-semibold">{userData.name}</p>
             <div className='flex gap-2'>
               <p className="text-md font-semibold text-yellow-500">Lv.{userData.levelIndex}</p>
-              <div className='border rounded-lg bg-green-500 text-[14px] px-2 cursor-pointer hover:bg-blue-500' onClick={handleOpen}>Up</div>
+              <button class="bg-[#FFC658] hover:bg-[#FFC658EE] text-[#C94A0C] font-bold px-2 border-b-[3px] border-r-[3px] border-[#c18f2d] shadow rounded" onClick={handleOpen}>
+                Up
+              </button>
             </div>
           </div>
         </div>
@@ -231,7 +233,9 @@ const Earn = () => {
           <div className='flex gap-2 items-center'>
             <img src="/assets/img/loader.webp" alt='coin' width="30px" height="30px" />
             <p className='text-white text-lg'>{coin}</p> 
-            <div className="border rounded-lg px-2 bg-brown-900 hover:bg-green-700 font-bold text-yellow-400 hover:text-white cursor-pointer" onClick={handleShowPayment}>+</div>
+            <button class="bg-[#FFC658] hover:bg-[#FFC658EE] text-[#C94A0C] font-bold px-2 border-b-[3px] border-r-[3px] border-[#c18f2d] shadow rounded" onClick={handleShowPayment}>
+                +
+            </button>
           </div>
           <div className='flex gap-5'>
             <div className='flex gap-1'>
@@ -342,8 +346,7 @@ const Earn = () => {
               ))}
           </div>
           <div className='flex mt-1'>
-            <p className="text-center text-xl font-bold border px-2 py-1"> {tapped} Clicks</p>
-            <p className='border px-2 py-1 text-[18px]'>{ tapLimit } Taps Limit</p>
+            <p className="text-center text-lg px-2 py-1 bg-[#00000044] rounded-md"> {tapped} Clicks / { tapLimit } Taps Limit</p>
           </div>
           <div className='flex w-full px-1'>
             <img src="/assets/img/reward.png" alt='Default User' className='w-[60px] h-[72px] cursor-pointer mt-[-100px]' onClick={handleRewardOpen}/>

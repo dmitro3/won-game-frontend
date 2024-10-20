@@ -55,9 +55,9 @@ const Mine = () => {
                     <MineCharacter character={character} armor={attack} shield={shield} />
                 </div>
                 <div className='flex justify-between'>
-                    <img src="/assets/img/character.png" style={{border: type == "character" ? "3px solid" : "none"}} onClick={() => handleSelect('character')} className='cursor-pointer w-[125px] h-[45px]'/>
-                    <img src="/assets/img/attack.png" style={{border: type == "attack" ? "3px solid" : "none"}} onClick={() => handleSelect('attack')} className='cursor-pointer w-[90px] h-[45px]'/>
-                    <img src="/assets/img/defence.png" style={{border: type == "defence" ? "3px solid" : "none"}} onClick={() => handleSelect('defence')} className='cursor-pointer w-[105px] h-[45px]'/>
+                    <img src="/assets/img/character.png" style={{border: type == "character" ? "1px solid" : "none"}} onClick={() => handleSelect('character')} className='cursor-pointer w-[125px] h-[45px]'/>
+                    <img src="/assets/img/attack.png" style={{border: type == "attack" ? "1px solid" : "none"}} onClick={() => handleSelect('attack')} className='cursor-pointer w-[90px] h-[45px]'/>
+                    <img src="/assets/img/defence.png" style={{border: type == "defence" ? "1px solid" : "none"}} onClick={() => handleSelect('defence')} className='cursor-pointer w-[105px] h-[45px]'/>
                 </div>
 
                 <div className="flex flex-col mt-3 space-y-3 w-full h-[240px] overflow-y-auto scrollbar-hide">

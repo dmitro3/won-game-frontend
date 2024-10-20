@@ -33,7 +33,7 @@ const MineItem = ({ onItemSelect, type }) => {
                             </div>
                             {
                                 item.isWear && 
-                                <div className="absolute top-[0] right-[0] border rounded-l px-2 bg-green-500 text-[11px]">
+                                <div className="absolute top-[0] right-[0] rounded-l px-2 bg-green-500 text-[11px]">
                                     Use
                                 </div>
                             }

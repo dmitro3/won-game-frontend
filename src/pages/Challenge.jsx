@@ -8,7 +8,7 @@ import { getItem, viewAll } from '../actions/mine';
 import { useNavigate } from 'react-router-dom';
 
 let interval;
-let timeDuration = 200; // ms
+let timeDuration = 50; // ms
 let monsterInterval;
 let timerInterval;
 
@@ -20,6 +20,7 @@ const Challenge = () => {
     const [wins, setWins] = useState(0);
     const [earned, setEarned] = useState(0);
     const [battleTime, setBattleTime] = useState(0);
+    const [aniInterval, setAniInterval] = useState(-1);
     const [manSparks, setManSparks] = useState([]);
     const [monsterSparks, setMonsterSparks] = useState([]);
 
@@ -144,12 +145,7 @@ const Challenge = () => {
         // Monster shoots a spark every 3 seconds
         monsterInterval = setInterval(() => {
             shootMonsterSpark();
-        }, 4000);
-    
-        // Update game timer every second
-        timerInterval = setInterval(() => {
-            setBattleTime((prev) => prev + 1);
-        }, 1000);
+        }, 800);
     
         return () => {
             clearInterval(monsterInterval);
@@ -178,14 +174,18 @@ const Challenge = () => {
         } else if (!dlgShow) {
             interval = setTimeout(() => doFightAction(), timeDuration);
         }
-    }, [battleTime]);
+    }, [aniInterval]);
 
     const startFighting = () => {
         setDlgShow(false);
         setBackShow(false);
-        timePos = 0;
-        fightDuration = 0;
+        // timePos = 0;
+        // fightDuration = 0;
+
         setBattleTime(() => 0);
+        setAniInterval(() => 1);
+        
+        timerInterval = setInterval(() => setBattleTime((prev) => prev + 1), 1000);
     }
 
     const doFightAction = () => {
@@ -199,7 +199,8 @@ const Challenge = () => {
         setManSparks((prevSparks) => {
             return prevSparks.filter((spark) => {
                 if (spark.position >= 310) {
-                    let manAttack = Math.floor(mine.attack * 0.85 - monster.defence);
+                    let rand = Math.random();
+                    let manAttack = Math.floor(mine.attack * 0.85 - monster.defence * (1 + rand));
                     if (manAttack < 0) manAttack = 1;
                     setMonster(cur => {
                         let curHealth = cur.curHealth - manAttack * 3;
@@ -217,9 +218,9 @@ const Challenge = () => {
     
         setMonsterSparks((prevSparks) => {
             return prevSparks.filter((spark) => {
-                if (spark.position <= 30) { 
-                    let monsterAttack = Math.floor(monster.attack - mine.defence * 0.8);
-                    // let monsterAttack = 80;
+                if (spark.position <= 30) {
+                    let rand = Math.random();
+                    let monsterAttack = Math.floor(monster.attack + (1 + rand) - mine.defence * 0.8);
                     if (monsterAttack < 0) monsterAttack = 1;
                     setMine(cur => {
                         let curHealth = cur.curHealth - monsterAttack * 3;
@@ -236,7 +237,7 @@ const Challenge = () => {
             });
         });
 
-        setBattleTime(battleTime => battleTime + 1);
+        setAniInterval(aniInterval => aniInterval + 1);
         clearTimeout(interval);
     }
 
@@ -310,8 +311,8 @@ const Challenge = () => {
                 <div className="w-full h-full p-2 z-10 bg-[#000E] absolute bg-[url('/assets/img/bg_vs.png')] bg-center bg-contain bg-no-repeat">
                     <div className="bg-blue-gray-500top-0 left-0 z-40 p-2">
                         <div className="flex flex-center justify-between items-center mt-[20px] px-3">
-                            <div className="flex flex-col justify-start border-2 border-blue-500 py-4 px-2 rounded-lg bg-[#6CF47F66]">
-                                <img src={mine && mine.avatar ? mine.avatar : "/assets/character/man1.png"} alt='avatar' 
+                            <div className="flex flex-col justify-start border-[5px] border-blue-500 py-4 px-2 rounded-lg bg-[#6CF47F66]">
+                                <img src={mine ? mine.avatar : "/assets/character/man1.png"} alt='avatar' 
                                     className="w-[120px] h-[160px] mx-auto"/>
                                 <div className="flex gap-2 items-center mt-5">
                                     <img src="/assets/img/heart.png" alt='avatar' className="w-[22px] h-[22px]"/>
@@ -354,8 +355,12 @@ const Challenge = () => {
                         </div>
 
                         <div className="flex justify-between p-4 mt-10">
-                            <Button color="red" className="text-[20px] w-[140px]" onClick={() => startFighting()}>Fight</Button>
-                            <Button color="blue" className="text-[20px] w-[140px]" onClick={()=>nav("/home")}>Cancel</Button>
+                            <button class="bg-[#FFC658] hover:bg-[#FFC658EE] text-[#C94A0C] text-[20px] py-2 font-bold px-6 border-b-[4px] border-r-[4px] border-[#c18f2d] shadow rounded w-[140px]" onClick={() => startFighting()}>
+                                Fight
+                            </button>
+                            <button class="bg-[#FFC658] hover:bg-[#FFC658EE] text-[#C94A0C] text-[20px] py-2 font-bold px-6 border-b-[4px] border-r-[4px] border-[#c18f2d] shadow rounded w-[140px]" onClick={()=>nav("/home")}>
+                                Cancel
+                            </button>
                         </div>
 
                     </div>
@@ -366,7 +371,7 @@ const Challenge = () => {
                     <div className="flex justify-between items-center">
                         <div className="p-2 w-full">
                             <div className="flex justify-between px-3">
-                                <img src={mine && mine.avatar ? mine.avatar : "/assets/character/man1.png"} alt='avatar' className="w-[32px] h-[40px]"/>
+                                <img src={mine ? mine.avatar : "/assets/character/man1.png"} alt='avatar' className="w-[32px] h-[40px]"/>
                                 <div>
                                     <div className='flex gap-1 items-center justify-end'>
                                         <img 
@@ -450,7 +455,8 @@ const Challenge = () => {
                         <p className="text-[20px] font-bold">Battle Time Elapsed:</p>
                         <div style={{ textAlign: 'center'}}>
                             <div style={{ fontSize: '48px', fontWeight: 'bold' }}>
-                                {Math.ceil(battleTime / 5).toString().padStart(2, '0')}
+                                {/* {Math.ceil(battleTime / (1000 / timeDuration)).toString().padStart(2, '0')} */}
+                                {Math.ceil(battleTime).toString().padStart(2, '0')}
                             </div>
                         </div>
                     </div>
@@ -486,9 +492,8 @@ const Challenge = () => {
                                 left: "0px",
                                 bottom: '-10px',
                             }}/>
-
-                            {manSparks.map((spark, key) => (
-                                <img key={key} src='/assets/challenge/man_spark4.png' alt='character' className="w-[20px] h-[20px] block" style={{
+                            {manSparks.map((spark, idx) => (
+                                <img key={idx} src='/assets/challenge/man_spark4.png' alt='character' className="w-[20px] h-[20px] block" style={{
                                     position: 'absolute',
                                     left: `${spark.position}px`,
                                     bottom: '40px',
@@ -501,8 +506,8 @@ const Challenge = () => {
                                 left: "300px",
                                 bottom: '-10px',
                             }}/>
-                            {monsterSparks.map((spark, key) => (
-                                <img key={key} src='/assets/challenge/mon_spark.png' alt='character' className="w-[20px] h-[20px] block" style={{
+                            {monsterSparks.map((spark, idx) => (
+                                <img key={idx} src='/assets/challenge/mon_spark.png' alt='character' className="w-[20px] h-[20px] block" style={{
                                     position: 'absolute',
                                     left: `${spark.position}px`,
                                     bottom: '53px',
