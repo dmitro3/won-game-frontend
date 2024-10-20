@@ -73,15 +73,15 @@ const Milestones = () => {
                 </div>
             }
             {activityData.tapLimit == 0 &&
-                <div className='flex justify-between px-4 border rounded-lg py-2 mb-4'>
-                <div className='flex gap-2 items-center'>
-                    <img src="/assets/img/platinum.webp" alt='tap' className="w-[40px] h-[40px]"/>
-                    <p className='text-white font-extrabold text-[14px]'>100 Taps Click</p>
-                </div>
-                <Button color='green' className='flex gap-1 items-center' onClick={receiveTapReward} disabled={activityData.isTapReceived}>
-                    <img src="/assets/img/loader.webp" alt='coin' className="w-[20px] h-[20px]" />
-                    <p className='text-white text-[16px]'>20</p>
-                </Button>
+                <div className='flex justify-between px-2 sm:px-4 border rounded-lg py-1 sm:py-2 mb-4 mt-3'>
+                    <div className='flex gap-2 items-center'>
+                        <img src="/assets/img/platinum.webp" alt='tap' className="w-[40px] h-[40px]"/>
+                        <p className='text-white font-extrabold text-[14px]'>100 Taps Click</p>
+                    </div>
+                    <Button color='green' className='flex gap-1 items-center' onClick={receiveTapReward} disabled={activityData.isTapReceived}>
+                        <img src="/assets/img/loader.webp" alt='coin' className="w-[20px] h-[20px]" />
+                        <p className='text-white text-[16px]'>20</p>
+                    </Button>
                 </div>
             }
         </div>
