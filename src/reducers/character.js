@@ -15,7 +15,6 @@ const characterReducer = (state = initialState, action) => {
 				characters: payload.data,
 			};
 		case UNLOCK_CHARACTER:
-			console.log("payload", payload.data);
 			return {
 				...state,
 				characters: payload.data,

@@ -12,7 +12,6 @@ export const viewCharacters = () => async (dispatch, getState) => {
   let state = getState();
   try {
     const res = await api(`${serverUrl}/character/`, 'get', null, state.other.token);
-    console.log("character data", res);
     dispatch({
       type: VIEW_CHARACTERS,
       payload: res.data
@@ -24,7 +23,6 @@ export const viewCharacters = () => async (dispatch, getState) => {
 
 export const unlockCharacter = ({telegramId, characterData}, callback) => async (dispatch, getState) => {
   let state = getState();
-  console.log("charactor---", characterData);
   try {
     const res = await api(`${serverUrl}/character/${telegramId}`, 'put', {
       name: characterData.username,

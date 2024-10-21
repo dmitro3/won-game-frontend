@@ -20,7 +20,6 @@ const ViewDetails = ({ selectedItemId, onSelectItem }) => {
         dispatch(wearItem({telegramId, itemData}));
     }
 
-    console.log("Item selected", indiMineData);
     return (
         <div className="flex justify-between p-3 border">
             <div className="flex gap-5">

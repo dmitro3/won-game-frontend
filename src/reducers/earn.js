@@ -16,14 +16,12 @@ const earnReducer = (state = initialState, action) => {
 				level: payload.level
 			};
 		case UPDATE_USER:
-			console.log("updated---", payload.level);
 			return {
 				...state,
 				user: payload.data,
 				level: payload.level
 			};
 		case UPDATE_TOKEN:
-			console.log(state);
 			state.user['tokens'] = payload;
 			return {
 				...state,

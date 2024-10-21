@@ -82,8 +82,6 @@ const BuyToken = ({onSubmit, onClose}) => {
 
         tokensNeeded = amount * items[type].tokenNeeded;
 
-        console.log(amount, tokensNeeded, key);
-
         if (isSafeValue(userData.tokens, 1) >= tokensNeeded) {
             setNeedShow(false);
             let data = { tokens: userData.tokens - tokensNeeded, levelIndex: userData.levelIndex, [key]: isSafeValue(userData[key]) + amount };

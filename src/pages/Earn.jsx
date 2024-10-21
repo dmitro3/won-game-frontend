@@ -121,7 +121,6 @@ const Earn = () => {
       handleShowPayment();
     }
     else {
-      console.log(next.levelIndex);
       setCoin((val)=> val-next.tapBalanceRequired);
       let data = {levelIndex: next.levelIndex, tokens: coin - next.tapBalanceRequired, energyLimit: next.energy};
       dispatch(updateUser({telegramId, data}));
@@ -141,11 +140,9 @@ const Earn = () => {
     if (tapLimit <= 0) return;
     setCounts((prev) => {
       const newCount = prev + tapSpeed;
-      console.log("prev", prev, tapSpeed, newCount);
       return newCount;
     });
     setTapped(prev => prev + tapSpeed);
-    console.log("count", counts);
     
     setTapLimit(prev => prev - tapSpeed);
     let data_activity = {tapLimit: tapLimit - tapSpeed};

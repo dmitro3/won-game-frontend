@@ -18,7 +18,6 @@ const Tournament = () => {
     }, []);
 
     const onFight = (monster) => {
-        console.log("monster", monster);
         if(userData.tokens < monster.tokenSpend) {
             dispatch(showPayment(true));
             return;

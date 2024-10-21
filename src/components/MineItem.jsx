@@ -10,7 +10,6 @@ const MineItem = ({ onItemSelect, type }) => {
     useEffect(() => {
         let items = mineData.filter((item) => item.type == type);
         setItems(items);
-        console.log("Load item", items);
     }, [type, mineData]);
 
     const onSelect = (item) => {

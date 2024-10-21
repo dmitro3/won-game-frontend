@@ -23,7 +23,6 @@ const Mine = () => {
     }, []);
 
     useEffect(() => {
-        console.log(mineItems);
         mineItems.forEach((item) => {
             if (item.type == 'character' && item.isWear) setCharacter(item.imageSrc);
             if (item.type == 'attack' && item.isWear) setAttack(item.imageSrc);

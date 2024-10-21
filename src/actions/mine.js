@@ -8,7 +8,6 @@ export const viewAll = ({telegramId, username}) => async (dispatch, getState) =>
   let state = getState();
   try {
     const res = await api(`${serverUrl}/mine/${telegramId}`, 'get', null, state.other.token);
-    console.log("minedata", res.data);
     dispatch({
       type: VIEW_ALL,
       payload: res.data
