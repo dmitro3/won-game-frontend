@@ -115,8 +115,6 @@ const Earn = () => {
   }, [userData, mineData]);
 
   const updatelevel = () => {
-    dispatch(updateToken({telegramId, tokenToAdd: 2000}));
-
     if(next.tapBalanceRequired > userData.tokens) {
       handleShowPayment();
     }
