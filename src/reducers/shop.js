@@ -1,4 +1,4 @@
-import { BUY_ITEM, VIEW_ITEMS } from '../constants/shopConstants';
+import { BUY_ITEM, VIEW_ITEMS, MAKE_ITEM } from '../constants/shopConstants';
 
 const initialState = {
 	items: [],
@@ -17,6 +17,10 @@ const shopReducer = (state = initialState, action) => {
 			return {
 				...state,
 				items: payload.data,
+			};
+		case MAKE_ITEM:
+			return {
+				...state,
 			};
 		default:
 			return state;

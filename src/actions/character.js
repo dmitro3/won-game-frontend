@@ -1,6 +1,7 @@
 import { 
   VIEW_CHARACTERS, 
   UNLOCK_CHARACTER, 
+  ADD_CHARACTER
 } from '../constants/characterConstants';
 
 import {
@@ -14,6 +15,19 @@ export const viewCharacters = () => async (dispatch, getState) => {
     const res = await api(`${serverUrl}/character/`, 'get', null, state.other.token);
     dispatch({
       type: VIEW_CHARACTERS,
+      payload: res.data
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const addCharacter = (newCharacter) => async (dispatch, getState) => {
+  let state = getState();
+  try {
+    const res = await api(`${serverUrl}/character/new`, 'post', newCharacter, state.other.token);
+    dispatch({
+      type: ADD_CHARACTER,
       payload: res.data
     });
   } catch (err) {

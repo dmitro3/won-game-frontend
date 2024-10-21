@@ -25,8 +25,8 @@ const Shop = () => {
             dispatch(showPayment(true));
             return;
         }
-
-        dispatch(buyItem({id: item._id}, () => {
+        let itemData = {id: item._id, username: username};
+        dispatch(buyItem({telegramId, itemData}, () => {
             dispatch(viewAll({telegramId, username}));
         }));
         let data = {tokens: userData.tokens - item.price, levelIndex: userData.levelIndex};

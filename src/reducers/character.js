@@ -1,4 +1,4 @@
-import { VIEW_CHARACTERS, UNLOCK_CHARACTER } from '../constants/characterConstants';
+import { VIEW_CHARACTERS, UNLOCK_CHARACTER, ADD_CHARACTER } from '../constants/characterConstants';
 
 const initialState = {
 	characters: [],
@@ -13,6 +13,11 @@ const characterReducer = (state = initialState, action) => {
 			return {
 				...state,
 				characters: payload.data,
+			};
+		case ADD_CHARACTER:
+			return {
+				...state,
+				character: payload.data
 			};
 		case UNLOCK_CHARACTER:
 			return {

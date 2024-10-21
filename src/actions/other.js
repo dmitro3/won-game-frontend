@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { LOAD_MONSTERS, SHOW_PAYMENT, SET_RANKING, SET_TARGET_MONSTER, SET_TELEGRAM_CONFIG, SET_API_TOKEN } from '../constants/otherConstants';
+import { LOAD_MONSTERS, SHOW_PAYMENT, SET_RANKING, SET_TARGET_MONSTER, SET_TELEGRAM_CONFIG, SET_API_TOKEN, ADD_LEVEL, ADD_MONSTER, ADD_CHALLENGE } from '../constants/otherConstants';
 import {
   baseUrl,
   serverUrl
@@ -41,6 +41,48 @@ export const getChallenge = (idx) => async (dispatch, getState) => {
       payload: res.data.data,
     });
   } catch (err) { 
+    console.log(err);
+  }
+};
+
+export const addLevel = (itemData) => async (dispatch, getState) => {
+  let state = getState();
+  try {
+    const res = await api(`${serverUrl}/etc/level/new`, 'post', itemData, state.other.token);
+    dispatch({
+      type: ADD_LEVEL,
+      payload: res.data
+    });
+    console.log("new item", res.data);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const addMonster = (itemData) => async (dispatch, getState) => {
+  let state = getState();
+  try {
+    const res = await api(`${serverUrl}/etc/monster/new`, 'post', itemData, state.other.token);
+    dispatch({
+      type: ADD_MONSTER,
+      payload: res.data
+    });
+    console.log("new item", res.data);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const addChallenge = (itemData) => async (dispatch, getState) => {
+  let state = getState();
+  try {
+    const res = await api(`${serverUrl}/etc/challenge/new`, 'post', itemData, state.other.token);
+    dispatch({
+      type: ADD_CHALLENGE,
+      payload: res.data
+    });
+    console.log("new item", res.data);
+  } catch (err) {
     console.log(err);
   }
 };

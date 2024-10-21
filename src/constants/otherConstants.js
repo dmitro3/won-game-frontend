@@ -4,3 +4,6 @@ export const SET_RANKING = 'SET_RANKING';
 export const SET_TARGET_MONSTER = 'SET_TARGET_MONSTER';
 export const SET_TELEGRAM_CONFIG = 'SET_TELEGRAM_CONFIG';
 export const SET_API_TOKEN = 'SET_API_TOKEN';
+export const ADD_LEVEL = 'ADD_LEVEL';
+export const ADD_MONSTER = 'ADD_MONSTER';
+export const ADD_CHALLENGE = 'ADD_CHALLENGE';
