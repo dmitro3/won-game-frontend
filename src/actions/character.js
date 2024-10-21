@@ -1,20 +1,18 @@
-import axios from 'axios';
 import { 
   VIEW_CHARACTERS, 
   UNLOCK_CHARACTER, 
-  SELECT_CHARACTER 
 } from '../constants/characterConstants';
 
 import {
   serverUrl,
-  telegramId,
-  username,
 } from '../utils/constants';
+import { api } from '../utils/api';
 
-
-export const viewCharacters = () => async dispatch => {
+export const viewCharacters = () => async (dispatch, getState) => {
+  let state = getState();
   try {
-    const res = await axios.get(`${serverUrl}/character/`);
+    const res = await api(`${serverUrl}/character/`, 'get', null, state.other.token);
+    console.log("character data", res);
     dispatch({
       type: VIEW_CHARACTERS,
       payload: res.data
@@ -24,13 +22,14 @@ export const viewCharacters = () => async dispatch => {
   }
 };
 
-export const unlockCharacter = (userData, callback) => async dispatch => {
+export const unlockCharacter = ({telegramId, characterData}, callback) => async (dispatch, getState) => {
+  let state = getState();
+  console.log("charactor---", characterData);
   try {
-    const res = await axios.put(`${serverUrl}/character/${telegramId}`, 
-    {
-      name: username,
-      id: userData.id,
-    });
+    const res = await api(`${serverUrl}/character/${telegramId}`, 'put', {
+      name: characterData.username,
+      id: characterData.id,
+    }, state.other.token);
     
     dispatch({
       type: UNLOCK_CHARACTER,
@@ -39,23 +38,6 @@ export const unlockCharacter = (userData, callback) => async dispatch => {
 
     if (callback) callback();
 
-  } catch (err) {
-    console.log(err);
-  }
-};
-
-export const selectCharacter = (userData) => async dispatch => {
-  try {
-    const res = await axios.put(`${serverUrl}/character/${telegramId}`, 
-    {
-      name: username,
-      id: userData.id,
-    });
-    
-    dispatch({
-      type: SELECT_CHARACTER,
-      payload: res.data
-    });
   } catch (err) {
     console.log(err);
   }

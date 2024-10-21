@@ -2,6 +2,7 @@ import Animate from "../components/Animate";
 import { Card, Input, Button, Typography } from "@material-tailwind/react";
 
 const Settings = () => {
+    
     return (
         <Animate>
             <Card color="transparent" shadow={true} className="max-w-sm mx-auto h-full bg-gray-900 text-white p-6 rounded-lg shadow-lg">

@@ -3,7 +3,7 @@ import { Progress, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Typog
 import Milestones from "../components/Milestones";
 import styled, { keyframes } from "styled-components";
 import { useDispatch, useSelector } from 'react-redux';
-import { viewUser, updateUser } from '../actions/earn';
+import { viewUser, updateUser, updateToken } from '../actions/earn';
 import { viewAll } from '../actions/mine';
 import { viewActivity, updateActivity } from '../actions/activity';
 import { showPayment, getChallenge } from '../actions/other';
@@ -54,12 +54,14 @@ const Earn = () => {
   const activityData = useSelector((state)=> state.activity.activity);
   const mineData = useSelector((state) => state.mine.items);
   const levelData = useSelector((state)=> state.earn.level);
+  const telegramId = useSelector((state)=> state.other.telegramId);
+  const username = useSelector((state)=> state.other.username);
   const nav = useNavigate();
   
   useEffect(() => {
-      dispatch(viewUser());
-      dispatch(viewActivity());
-      dispatch(viewAll());
+      dispatch(viewUser({telegramId, username}));
+      dispatch(viewActivity({telegramId, username}));
+      dispatch(viewAll({telegramId, username}));
   },[]);
 
   const isEmpty = (val) => {
@@ -96,7 +98,6 @@ const Earn = () => {
   
   useEffect(() => {
     let equipped = mineData.filter((item) => item.isWear);
-    console.log("mine---", mineData);
     let attack = 0, defence = 0;
     equipped.forEach((equip) => {
         if (equip.type == 'attack') attack = equip.attribute;
@@ -114,14 +115,18 @@ const Earn = () => {
   }, [userData, mineData]);
 
   const updatelevel = () => {
+    dispatch(updateToken({telegramId, tokenToAdd: 2000}));
+
     if(next.tapBalanceRequired > userData.tokens) {
       handleShowPayment();
     }
     else {
       console.log(next.levelIndex);
       setCoin((val)=> val-next.tapBalanceRequired);
-      dispatch(updateUser({levelIndex: next.levelIndex, tokens: coin - next.tapBalanceRequired, energyLimit: next.energy}));
-      dispatch(updateActivity({tapLimit: next.tapLimit}));
+      let data = {levelIndex: next.levelIndex, tokens: coin - next.tapBalanceRequired, energyLimit: next.energy};
+      dispatch(updateUser({telegramId, data}));
+      let data_activity = {tapLimit: next.tapLimit};
+      dispatch(updateActivity({telegramId, data_activity}));
     }
     handleOpen();
   }
@@ -143,14 +148,12 @@ const Earn = () => {
     console.log("count", counts);
     
     setTapLimit(prev => prev - tapSpeed);
-    dispatch(updateActivity({tapLimit: tapLimit - tapSpeed}));
+    let data_activity = {tapLimit: tapLimit - tapSpeed};
+    dispatch(updateActivity({telegramId, data_activity}));
     if (currentEnergy < totalEnergy) {
       setCurrentEnergy(prev => prev + tapSpeed);
-      dispatch(updateUser({
-        currentEnergy: currentEnergy + tapSpeed,
-        levelIndex: level,
-        points: counts + tapSpeed,
-      }));
+      let data = {currentEnergy: currentEnergy + tapSpeed, levelIndex: level, points: counts + tapSpeed };
+      dispatch(updateUser({ telegramId, data }));
     }
     
     const { offsetX, offsetY, target } = e.nativeEvent;
@@ -223,7 +226,7 @@ const Earn = () => {
             <p className="text-lg font-semibold">{userData.name}</p>
             <div className='flex gap-2'>
               <p className="text-md font-semibold text-yellow-500">Lv.{userData.levelIndex}</p>
-              <button class="bg-[#FFC658] hover:bg-[#FFC658EE] text-[#C94A0C] font-bold px-2 border-b-[3px] border-r-[3px] border-[#c18f2d] shadow rounded" onClick={handleOpen}>
+              <button className="bg-[#FFC658] hover:bg-[#FFC658EE] text-[#C94A0C] font-bold px-2 border-b-[3px] border-r-[3px] border-[#c18f2d] shadow rounded" onClick={handleOpen}>
                 Up
               </button>
             </div>
@@ -233,7 +236,7 @@ const Earn = () => {
           <div className='flex gap-2 items-center'>
             <img src="/assets/img/loader.webp" alt='coin' width="30px" height="30px" />
             <p className='text-white text-lg'>{coin}</p> 
-            <button class="bg-[#FFC658] hover:bg-[#FFC658EE] text-[#C94A0C] font-bold px-2 border-b-[3px] border-r-[3px] border-[#c18f2d] shadow rounded" onClick={handleShowPayment}>
+            <button className="bg-[#FFC658] hover:bg-[#FFC658EE] text-[#C94A0C] font-bold px-2 border-b-[3px] border-r-[3px] border-[#c18f2d] shadow rounded" onClick={handleShowPayment}>
                 +
             </button>
           </div>

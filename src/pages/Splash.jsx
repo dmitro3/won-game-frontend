@@ -2,12 +2,18 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Circles } from 'react-loader-spinner';
 import { useNavigate } from 'react-router-dom';
+import { getApiToken, setTelegramConfig } from '../actions/other';
+import { useDispatch } from 'react-redux';
 
 const Splash = () => {
-
+    const dispatch = useDispatch();
     const nav = useNavigate();
+    const telegramUsername = window.Telegram.WebApp.initDataUnsafe?.user?.username;
+    const telegramUserid = window.Telegram.WebApp.initDataUnsafe?.user?.id;
 
     useEffect(() => {
+        dispatch(setTelegramConfig({telegramId: telegramUserid, username: telegramUsername}));
+        dispatch(getApiToken());
         
         setTimeout(() => nav('/home'), 5000);
     }, []);

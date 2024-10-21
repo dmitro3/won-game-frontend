@@ -1,4 +1,4 @@
-import { UPDATE_USER, VIEW_USER } from '../constants/earnConstants';
+import { UPDATE_TOKEN, UPDATE_USER, VIEW_USER } from '../constants/earnConstants';
 
 const initialState = {
 	user: {},
@@ -21,6 +21,12 @@ const earnReducer = (state = initialState, action) => {
 				...state,
 				user: payload.data,
 				level: payload.level
+			};
+		case UPDATE_TOKEN:
+			console.log(state);
+			state.user['tokens'] = payload;
+			return {
+				...state,
 			};
 		default:
 			return state;

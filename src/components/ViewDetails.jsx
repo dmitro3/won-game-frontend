@@ -2,17 +2,22 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@material-tailwind/react";
 import { useDispatch, useSelector } from 'react-redux';
 import { viewItem, wearItem } from '../actions/mine';
+import { username } from '../utils/constants';
 
 const ViewDetails = ({ selectedItemId, onSelectItem }) => {
     const dispatch = useDispatch();
     const indiMineData = useSelector((state) => state.mine.item);
+    const telegramId = useSelector((state)=> state.other.telegramId);
+    const username = useSelector((state)=> state.other.username);
     
     useEffect(() => {
-        dispatch(viewItem({id: selectedItemId}));
+        let data = {id: selectedItemId, username: username};
+        dispatch(viewItem({telegramId, data}));
     },[]);
     
     const handleWear = () => {
-        dispatch(wearItem({id: selectedItemId, type: indiMineData.type}));
+        let itemData = {id: selectedItemId, type: indiMineData.type, username: username};
+        dispatch(wearItem({telegramId, itemData}));
     }
 
     console.log("Item selected", indiMineData);

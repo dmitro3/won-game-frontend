@@ -1,16 +1,14 @@
-import axios from 'axios';
 import { VIEW_ALL, VIEW_ITEM, WEAR_ITEM, GET_ITEM, VIEW_BY_TYPE } from '../constants/mineConstants';
-
 import {
   serverUrl,
-  telegramId,
-  username,
 } from '../utils/constants';
+import { api } from '../utils/api';
 
-export const viewAll = () => async dispatch => {
+export const viewAll = ({telegramId, username}) => async (dispatch, getState) => {
+  let state = getState();
   try {
-    const res = await axios.get(`${serverUrl}/mine/${telegramId}`);
-    console.log("Mine Data", res);
+    const res = await api(`${serverUrl}/mine/${telegramId}`, 'get', null, state.other.token);
+    console.log("minedata", res.data);
     dispatch({
       type: VIEW_ALL,
       payload: res.data
@@ -20,27 +18,13 @@ export const viewAll = () => async dispatch => {
   }
 };
 
-export const viewByType = (userData) => async dispatch => {
+export const viewItem = ({telegramId, data}) => async (dispatch, getState) => {
+  let state = getState();
   try {
-    const res = await axios.post(`${serverUrl}/mine/`, {type: userData.type});
-    console.log("Mine Data By Type", res);
-    dispatch({
-      type: VIEW_BY_TYPE,
-      payload: res.data
-    });
-  } catch (err) {
-    console.log(err);
-  }
-};
-
-export const viewItem = (userData) => async dispatch => {
-  try {
-    const res = await axios.post(`${serverUrl}/mine/${telegramId}`, 
-    {
-      name: username,
-      id: userData.id,
-    });
-    console.log("Mine Data View By ID", res);
+    const res = await api(`${serverUrl}/mine/${telegramId}`, 'post', {
+      name: data.username,
+      id: data.id,
+    }, state.other.token);
     
     dispatch({
       type: VIEW_ITEM,
@@ -52,10 +36,10 @@ export const viewItem = (userData) => async dispatch => {
 };
 
 // Get item by ID
-export const getItem = () => async dispatch => {
+export const getItem = () => async (dispatch, getState) => {
+  let state = getState();
   try {
-    const res = await axios.get(`${serverUrl}/mine/`);
-    console.log("Mine Data Get Item", res);    
+    const res = await api(`${serverUrl}/mine/}`, 'get', state.other.token);
     dispatch({
       type: GET_ITEM,
       payload: res.data
@@ -65,15 +49,14 @@ export const getItem = () => async dispatch => {
   }
 };
 
-export const wearItem = (userData) => async dispatch => {
+export const wearItem = ({telegramId, itemData}) => async (dispatch, getState) => {
+  let state = getState();
   try {
-    const res = await axios.put(`${serverUrl}/mine/${telegramId}`, 
-    {
-      name: username,
-      id: userData.id,
-      type: userData.type
-    });
-    console.log("Mine Data Wear Item", res);
+    const res = await api(`${serverUrl}/mine/${telegramId}`, 'put', {
+      name: itemData.username,
+      id: itemData.id,
+      type: itemData.type
+    }, state.other.token);
     
     dispatch({
       type: WEAR_ITEM,

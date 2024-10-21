@@ -1,4 +1,4 @@
-import { VIEW_CHARACTERS, SELECT_CHARACTER, UNLOCK_CHARACTER } from '../constants/characterConstants';
+import { VIEW_CHARACTERS, UNLOCK_CHARACTER } from '../constants/characterConstants';
 
 const initialState = {
 	characters: [],
@@ -14,12 +14,8 @@ const characterReducer = (state = initialState, action) => {
 				...state,
 				characters: payload.data,
 			};
-		case SELECT_CHARACTER:
-			return {
-				...state,
-				character: payload.data,
-			};
 		case UNLOCK_CHARACTER:
+			console.log("payload", payload.data);
 			return {
 				...state,
 				characters: payload.data,

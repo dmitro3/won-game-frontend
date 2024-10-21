@@ -86,11 +86,8 @@ const BuyToken = ({onSubmit, onClose}) => {
 
         if (isSafeValue(userData.tokens, 1) >= tokensNeeded) {
             setNeedShow(false);
-            dispatch(updateUser({
-                tokens: userData.tokens - tokensNeeded,
-                levelIndex: userData.levelIndex,
-                [key]: isSafeValue(userData[key]) + amount,
-            }));
+            let data = { tokens: userData.tokens - tokensNeeded, levelIndex: userData.levelIndex, [key]: isSafeValue(userData[key]) + amount };
+            dispatch(updateUser({ telegramId, data }));
 
             if (type == 0)      setAttack2(0);
             else if (type == 1) setDefence2(0);
@@ -152,7 +149,7 @@ const BuyToken = ({onSubmit, onClose}) => {
                 </div>
 
                 <div className='flex items-center bg-green justify-end'>
-                    <button class="bg-[#FFC658] hover:bg-[#FFC658EE] text-[#C94A0C] font-bold py-1 px-2 border-b-[3px] border-r-[3px] border-[#c18f2d] shadow rounded" onClick={handleWallet}>
+                    <button className="bg-[#FFC658] hover:bg-[#FFC658EE] text-[#C94A0C] font-bold py-1 px-2 border-b-[3px] border-r-[3px] border-[#c18f2d] shadow rounded" onClick={handleWallet}>
                         Claim
                     </button>
                 </div>
@@ -179,7 +176,7 @@ const BuyToken = ({onSubmit, onClose}) => {
                                         className="h-[30px] w-[30px]" />
                                     <div>{item.tokenNeeded * itemVal}</div>
                                 </div>
-                                <button class="bg-[#FFC658] hover:bg-[#FFC658EE] text-[#C94A0C] font-bold py-1 px-2 border-b-[3px] border-r-[3px] border-[#c18f2d] shadow rounded" onClick={() => claimItems(idx)}>
+                                <button className="bg-[#FFC658] hover:bg-[#FFC658EE] text-[#C94A0C] font-bold py-1 px-2 border-b-[3px] border-r-[3px] border-[#c18f2d] shadow rounded" onClick={() => claimItems(idx)}>
                                     Claim
                                 </button>
                             </div>
@@ -193,7 +190,7 @@ const BuyToken = ({onSubmit, onClose}) => {
                         * Not enough token to buy items.
                     </div>
                 }
-                <button class="bg-[#FFC658] hover:bg-[#FFC658EE] text-[#C94A0C] font-bold py-1 px-2 border-b-[3px] border-r-[3px] border-[#c18f2d] shadow rounded mt-6" onClick={() => onClose()}>
+                <button className="bg-[#FFC658] hover:bg-[#FFC658EE] text-[#C94A0C] font-bold py-1 px-2 border-b-[3px] border-r-[3px] border-[#c18f2d] shadow rounded mt-6" onClick={() => onClose()}>
                     Close
                 </button>
             </div>

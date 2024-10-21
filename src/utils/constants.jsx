@@ -1,6 +1,6 @@
-// export const serverUrl = "http://147.79.74.156:5002/api";
-// export const serverUrl = "http://localhost:5002/api";
-export const serverUrl = "https://pvptest.wostore.xyz/api";
-// const serverUrl = "http://172.20.30.99:5002/api";
+export const baseUrl = "http://172.20.30.99:5002";
+// export const baseUrl = "https://pvptest.wostore.xyz";
+// export const baseUrl = "http://localhost:5002";
+export const serverUrl = `${baseUrl}/api`;
 export const telegramId = "123123";
 export const username="Winner";

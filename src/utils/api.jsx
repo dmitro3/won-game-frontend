@@ -1,39 +1,19 @@
-const SERVER_URL = "http://localhost:5002/api";
-// const SERVER_URL = "http://172.20.30.99:5002/api";
+import axios from 'axios';
 
-const doGet = (url, params) => {
-    console.log("API Get Call");
-    return doHTTP(url, "GET", params);
+export const api = async (url, method, data, token) => {
+    method = method.toLowerCase();
+    let headers = {
+        'Content-Type': 'application/json',
+        'TOKEN': `${token}`,  // Add the token here
+    };
+
+    if (method == 'get') {
+        return axios.get(url, {headers});
+    } else if (method == 'post') {
+        return axios.post(url, data, {headers});
+    } else if (method == 'put') {
+        return axios.put(url, data, {headers});
+    } else if (method == 'delete') {
+        return axios.delete(url, {headers});
+    }
 }
-
-const doPut = () => {
-    console.log("API Put Call");
-    return doHTTP(url, "PUT", params);
-}
-
-const doPost = () => {
-    console.log("API Post Call");
-    return doHTTP(url, "POST", params);
-}
-
-const doDelete = () => {
-    console.log("API Delete Call");
-    return doHTTP(url, "DELETE", params);
-}
-
-const doHTTP = (url, method, params) => {
-    return fetch(`${SERVER_URL}${url}`, {
-        method,
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(params),
-    });
-}
-
-export default {
-    doGet,
-    doPost,
-    doPut,
-    doDelete,    
-};

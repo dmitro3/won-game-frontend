@@ -36,6 +36,8 @@ const Challenge = () => {
     const mineData = useSelector((state) => state.mine.items);
     const activityData = useSelector((state)=> state.activity.activity);
     const selMonster = useSelector((state) => state.other.fightMonster);
+    const telegramId = useSelector((state)=> state.other.telegramId);
+    const username = useSelector((state)=> state.other.username);
     
     const shootManSpark = () => {
         setManSparks((prev) => [...prev, { id: Date.now(), position: 80 }]);
@@ -46,10 +48,10 @@ const Challenge = () => {
     };
 
     useEffect(() => {
-        dispatch(viewUser());
+        dispatch(viewUser({telegramId, username}));
         dispatch(getItem());
-        dispatch(viewAll());
-        dispatch(viewActivity());
+        dispatch(viewAll({telegramId, username}));
+        dispatch(viewActivity({telegramId, username}));
 
         return () => clearInterval(interval);
     }, []);
@@ -67,26 +69,15 @@ const Challenge = () => {
     }
 
     const handleWinner = () => {
-        dispatch(updateUser({
-            currentEnergy: mine.curHealth,
-            tokens: mine.tokens + monster.tokenEarns,
-            lastChallenge: monster.challengeIndex + 1,
-            levelIndex: userData.levelIndex,
-            pointsBalance: wins + 1,
-            tokensEarned: earned + monster.tokenEarns,
-        }));
+        let data = { currentEnergy: mine.curHealth, tokens: mine.tokens + monster.tokenEarns, lastChallenge: monster.challengeIndex + 1, levelIndex: userData.levelIndex, pointsBalance: wins + 1, tokensEarned: earned + monster.tokenEarns };
+        dispatch(updateUser({ telegramId, data }));
         setOpen((cur) => !cur);
         nav('/home');
     }
 
     const handleLoser = () => {
-        console.log("mine, monster", mine, monster);
-        dispatch(updateUser({
-            currentEnergy: mine.curHealth,
-            tokens: mine.tokens - monster.tokens,
-            lastChallenge: monster.challengeIndex,
-            levelIndex: userData.levelIndex
-        }));
+        let data = { currentEnergy: mine.curHealth, tokens: mine.tokens - monster.tokens, lastChallenge: monster.challengeIndex, levelIndex: userData.levelIndex };
+        dispatch(updateUser({ telegramId, data }));
         setOpen((cur) => !cur);
         nav('/home');
     }
@@ -157,7 +148,8 @@ const Challenge = () => {
         if (tapLimit <= 0) return;
         shootManSpark(); // Shoot a spark on each button click
         setTapLimit(prev => prev - 1);
-        dispatch(updateActivity({tapLimit: tapLimit - 1}));
+        let data_activity = {tapLimit: tapLimit - 1};
+        dispatch(updateActivity({telegramId, data_activity}));
     };
 
     useEffect(() => {
@@ -250,10 +242,8 @@ const Challenge = () => {
         setMine(cur => {
             let curAttack = cur.attack + boost[0];
             let attackItems = cur.attackItems - 1;
-            dispatch(updateUser({
-                levelIndex: userData.levelIndex,
-                attackItems: attackItems
-            }));
+            let data = { levelIndex: userData.levelIndex, attackItems: attackItems };
+            dispatch(updateUser({ telegramId, data }));
             return {
                 ...cur,
                 curAttack,
@@ -270,10 +260,8 @@ const Challenge = () => {
         setMine(cur => {
             let curDefence = cur.defence + boost[1];
             let defenceItems = cur.defenceItems - 1;
-            dispatch(updateUser({
-                levelIndex: userData.levelIndex,
-                defenceItems: defenceItems
-            }));
+            let data = { levelIndex: userData.levelIndex, defenceItems: defenceItems };
+            dispatch(updateUser({ telegramId, data }));
             return {
                 ...cur,
                 curDefence,
@@ -290,10 +278,8 @@ const Challenge = () => {
         setMine(cur => {
             let curHealth = cur.curHealth + boost[2];
             let lifeItems = cur.lifeItems - 1;
-            dispatch(updateUser({
-                levelIndex: userData.levelIndex,
-                lifeItems: lifeItems
-            }));
+            let data = { levelIndex: userData.levelIndex, lifeItems: lifeItems };
+            dispatch(updateUser({ telegramId, data }));
             return {
                 ...cur,
                 curHealth,
@@ -312,7 +298,7 @@ const Challenge = () => {
                     <div className="bg-blue-gray-500top-0 left-0 z-40 p-2">
                         <div className="flex flex-center justify-between items-center mt-[20px] px-3">
                             <div className="flex flex-col justify-start border-[5px] border-blue-500 py-4 px-2 rounded-lg bg-[#6CF47F66]">
-                                <img src={mine && mine.avatar ? mine.avatar : "/assets/character/man1.png"} alt='avatar' 
+                                <img src={mine ? mine.avatar : "/assets/character/man1.png"} alt='avatar' 
                                     className="w-[120px] h-[160px] mx-auto"/>
                                 <div className="flex gap-2 items-center mt-5">
                                     <img src="/assets/img/heart.png" alt='avatar' className="w-[22px] h-[22px]"/>
@@ -355,10 +341,10 @@ const Challenge = () => {
                         </div>
 
                         <div className="flex justify-between p-4 mt-10">
-                            <button class="bg-[#FFC658] hover:bg-[#FFC658EE] text-[#C94A0C] text-[20px] py-2 font-bold px-6 border-b-[4px] border-r-[4px] border-[#c18f2d] shadow rounded w-[140px]" onClick={() => startFighting()}>
+                            <button className="bg-[#FFC658] hover:bg-[#FFC658EE] text-[#C94A0C] text-[20px] py-2 font-bold px-6 border-b-[4px] border-r-[4px] border-[#c18f2d] shadow rounded w-[140px]" onClick={() => startFighting()}>
                                 Fight
                             </button>
-                            <button class="bg-[#FFC658] hover:bg-[#FFC658EE] text-[#C94A0C] text-[20px] py-2 font-bold px-6 border-b-[4px] border-r-[4px] border-[#c18f2d] shadow rounded w-[140px]" onClick={()=>nav("/home")}>
+                            <button className="bg-[#FFC658] hover:bg-[#FFC658EE] text-[#C94A0C] text-[20px] py-2 font-bold px-6 border-b-[4px] border-r-[4px] border-[#c18f2d] shadow rounded w-[140px]" onClick={()=>nav("/home")}>
                                 Cancel
                             </button>
                         </div>

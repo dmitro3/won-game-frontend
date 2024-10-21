@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { viewAll, viewByType } from '../actions/mine';
 
 const MineItem = ({ onItemSelect, type }) => {
     const dispatch = useDispatch();

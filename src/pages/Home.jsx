@@ -11,9 +11,10 @@ const Home = () => {
 
     const dispatch = useDispatch();
     const showPay = useSelector((state) => state.other.showPayment);
-
+    const telegramId = useSelector((state)=> state.other.telegramId);
+    const username = useSelector((state)=> state.other.username);
     useEffect(() => {
-        dispatch(viewUser());
+        dispatch(viewUser({telegramId, username}));
     }, [showPay]);
 
     return (
@@ -25,7 +26,7 @@ const Home = () => {
                 </AnimatePresence>
             </div>
 
-            <div id="footermain" className={`visible z-30 flex flex-col bg-transparent fixed bottom-0 left-0 right-0 justify-center items-center pb-5 px-3`}>
+            <div id="footermain" className={`visible z-30 flex flex-col bg-[#69423E] fixed bottom-0 left-0 right-0 justify-center items-center pb-5 px-3`}>
                 <Footer />
             </div>
 

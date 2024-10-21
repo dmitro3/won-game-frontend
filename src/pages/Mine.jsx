@@ -8,7 +8,6 @@ import { viewAll, viewItem } from '../actions/mine';
 import MineCharacter from '../components/MineCharacter';
 
 const Mine = () => {
-
     const dispatch = useDispatch();
     const [selectedItemId, setSelectedItemId] = useState(null); 
     const [type, setType] = useState("character");
@@ -16,9 +15,11 @@ const Mine = () => {
     const [attack, setAttack] = useState(null);
     const [shield, setShield] = useState(null);
     const mineItems = useSelector((state) => state.mine.items);
+    const telegramId = useSelector((state)=> state.other.telegramId);
+    const username = useSelector((state)=> state.other.username);
 
     useEffect(() => {
-        dispatch(viewAll());
+        dispatch(viewAll({telegramId, username}));
     }, []);
 
     useEffect(() => {
@@ -36,7 +37,8 @@ const Mine = () => {
 
     const handleItemClick = (id) => {
         setSelectedItemId(id);
-        dispatch(viewItem({id: id}));
+        let data = {id: id};
+        dispatch(viewItem({telegramId, data}));
     }
 
     const handleSelect = (type) => {
@@ -44,7 +46,7 @@ const Mine = () => {
     }
 
     const onSelectItem = () => {
-        dispatch(viewAll());
+        dispatch(viewAll({telegramId, username}));
     }
 
     return (

@@ -1,19 +1,18 @@
-import axios from 'axios';
 import { 
   VIEW_USER, 
   UPDATE_USER,
+  UPDATE_TOKEN,
 } from '../constants/earnConstants';
 
 import {
   serverUrl,
-  telegramId,
-  username,
 } from '../utils/constants';
+import { api } from '../utils/api';
 
-export const viewUser = () => async dispatch => {
+export const viewUser = ({telegramId, username}) => async (dispatch, getState) => {
+  let state = getState();
   try {
-    const res = await axios.post(`${serverUrl}/user/${telegramId}`, {name: username});
-    console.log("User Data", res);
+    const res = await api(`${serverUrl}/user/${telegramId}`, 'post', {name: username}, state.other.token);
     dispatch({
       type: VIEW_USER,
       payload: res.data
@@ -23,13 +22,26 @@ export const viewUser = () => async dispatch => {
   }
 };
 
-export const updateUser = (userData) => async dispatch => {
-  console.log("Update User", userData);
+export const updateUser = ({telegramId, data}) => async (dispatch, getState) => {
+  let state = getState();
   try {
-    const res = await axios.put(`${serverUrl}/user/${telegramId}`, userData);
+    const res = await api(`${serverUrl}/user/${telegramId}`, 'put', data, state.other.token);
     dispatch({
       type: UPDATE_USER,
       payload: res.data
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const updateToken = ({telegramId, tokenToAdd}) => async (dispatch, getState) => {
+  let state = getState();
+  try {
+    const res = await api(`${serverUrl}/user/token/${telegramId}`, 'put', {tokenToAdd}, state.other.token);
+    dispatch({
+      type: UPDATE_TOKEN,
+      payload: res.data,
     });
   } catch (err) {
     console.log(err);

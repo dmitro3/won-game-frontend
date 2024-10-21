@@ -1,10 +1,13 @@
-import { LOAD_MONSTERS, SET_RANKING, SET_TARGET_MONSTER, SHOW_PAYMENT } from '../constants/otherConstants';
-
+import { LOAD_MONSTERS, SET_RANKING, SET_TARGET_MONSTER, SHOW_PAYMENT, SET_TELEGRAM_CONFIG, SET_API_TOKEN } from '../constants/otherConstants';
+import { telegramId, username } from '../utils/constants';
 const initialState = {
 	ranking: [],
 	monster: [],
 	showPayment: false,
 	fightMonster: null,
+	telegramId: telegramId,
+	username: username,
+	token: '',
 };
 
 const otherReducer = (state = initialState, action) => {
@@ -31,6 +34,17 @@ const otherReducer = (state = initialState, action) => {
 				...state,
 				fightMonster: payload,
 			};	
+		case SET_TELEGRAM_CONFIG:
+			return {
+				...state,
+				telegramId: payload.telegramId ? payload.telegramId : state.telegramId,
+				username: payload.username ? payload.username: state.username
+			}
+		case SET_API_TOKEN:
+			return {
+				...state,
+				token: payload,
+			}
 		default:
 			return state;
 	}

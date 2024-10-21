@@ -9,11 +9,13 @@ const Milestones = () => {
     const [earned, setEarned] = useState(0);
     const userData = useSelector((state) => state.earn.user);
     const activityData = useSelector((state)=> state.activity.activity);
+    const telegramId = useSelector((state)=> state.other.telegramId);
+    const username = useSelector((state)=> state.other.username);
     const dispatch = useDispatch();
 
     useEffect(() => {
-        dispatch(viewUser());
-        dispatch(viewActivity());
+        dispatch(viewUser({telegramId, username}));
+        dispatch(viewActivity({telegramId, username}));
     },[]);
 
     const isEmpty = (val) => {
@@ -36,13 +38,21 @@ const Milestones = () => {
     }, [activityData]);
 
     const receiveDailyReward = () => {
-        dispatch(updateActivity({isDailyReceived: true}));
-        dispatch(updateUser({tokens: coin + (activityData.continueDate + 1) * 10, levelIndex: level, tokensEarned: earned + (activityData.continueDate + 1) * 10}));
+        let data_activity = {isDailyReceived: true};
+        dispatch(updateActivity({telegramId, data_activity}));
+        let data = {
+            tokens: coin + (activityData.continueDate + 1) * 10, levelIndex: level, tokensEarned: earned + (activityData.continueDate + 1) * 10
+        }
+        dispatch(updateUser({telegramId, data}));
     }
     
     const receiveTapReward = () => {
-        dispatch(updateActivity({isTapReceived: true}));
-        dispatch(updateUser({tokens: coin + 20, levelIndex: level, tokensEarned: earned + 20}));
+        let data_activity = {isTapReceived: true};
+        dispatch(updateActivity({telegramId, data_activity}));
+        let data = {
+            tokens: coin + 20, levelIndex: level, tokensEarned: earned + 20
+        }
+        dispatch(updateUser({telegramId, data}));
     }
 
     return (

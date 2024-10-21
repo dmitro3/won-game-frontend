@@ -10,13 +10,14 @@ import { updateUser } from '../actions/earn';
 import { showPayment } from '../actions/other';
 
 const Shop = () => {
-
     const userData = useSelector((state) => state.earn.user);
+    const telegramId = useSelector((state)=> state.other.telegramId);
+    const username = useSelector((state)=> state.other.username);
 
     const dispatch = useDispatch();
 
     useEffect(() => {
-        dispatch(viewAll());
+        dispatch(viewAll({telegramId, username}));
     }, []);
 
     const handleItemClick = (item) => {
@@ -26,10 +27,10 @@ const Shop = () => {
         }
 
         dispatch(buyItem({id: item._id}, () => {
-            dispatch(viewAll());
+            dispatch(viewAll({telegramId, username}));
         }));
-
-        dispatch(updateUser({tokens: userData.tokens - item.price, levelIndex: userData.levelIndex}));
+        let data = {tokens: userData.tokens - item.price, levelIndex: userData.levelIndex};
+        dispatch(updateUser({telegramId, data}));
     }
 
     const handleCharacterClick = (item) => {
@@ -37,12 +38,12 @@ const Shop = () => {
             dispatch(showPayment(true));
             return;
         }
-
-        dispatch(unlockCharacter({id: item._id}, () => {
-            dispatch(viewAll());
+        let characterData = {id: item._id, username: username};
+        dispatch(unlockCharacter({telegramId, characterData}, () => {
+            dispatch(viewAll({telegramId, username}));
         }));
-
-        dispatch(updateUser({tokens: userData.tokens - item.price, levelIndex: userData.levelIndex}));
+        let data = {tokens: userData.tokens - item.price, levelIndex: userData.levelIndex};
+        dispatch(updateUser({telegramId, data}));
     }
 
     return (
