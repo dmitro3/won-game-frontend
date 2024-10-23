@@ -53,7 +53,6 @@ export const addLevel = (itemData) => async (dispatch, getState) => {
       type: ADD_LEVEL,
       payload: res.data
     });
-    console.log("new item", res.data);
   } catch (err) {
     console.log(err);
   }
@@ -67,7 +66,6 @@ export const addMonster = (itemData) => async (dispatch, getState) => {
       type: ADD_MONSTER,
       payload: res.data
     });
-    console.log("new item", res.data);
   } catch (err) {
     console.log(err);
   }
@@ -81,7 +79,6 @@ export const addChallenge = (itemData) => async (dispatch, getState) => {
       type: ADD_CHALLENGE,
       payload: res.data
     });
-    console.log("new item", res.data);
   } catch (err) {
     console.log(err);
   }

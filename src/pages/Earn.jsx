@@ -153,11 +153,9 @@ const Earn = () => {
     // Set up the interval for sending requests every 2 seconds
     const interval = setInterval(() => {
       if (Object.keys(pendingUpdatesRef.current).length > 0) {
-        console.log("here---", pendingUpdatesRef.current);
         // Send the request with pending updates
         dispatch(updateActivity({ telegramId, data_activity: pendingUpdatesRef.current }));
         setPendingUpdates({}); // Clear pending updates after sending
-        setLastApiCall(Date.now());
       }
     }, 2000); // Set interval to 2 seconds
   
@@ -373,9 +371,9 @@ const Earn = () => {
           <Button onClick={handleAlertOpen} className='text-[16px] flex mx-auto mb-3 sm:px-4 sm:py-2 px-2 py-1' color="blue">Close</Button>
         </Dialog>
 
-        <div className="flex flex-col justify-center items-center mt-[20px] mb-2">
+        <div className="flex flex-col justify-center items-center mt-[40px] mb-2">
           <div className="flex justify-center relative">
-              <img src={userData.icon ?? "/assets/img/tap.png"} alt='tap' onPointerDown={handleClick} ref={imageRef} className="w-[240px] h-[220px] block cursor-pointer"/>
+              <img src={userData.icon ?? "/assets/img/tap.png"} alt='tap' onPointerDown={handleClick} ref={imageRef} className="w-[180px] h-[160px] block cursor-pointer"/>
               {clicks.map((click) => (
                   <SlideUpText key={click.id} x={click.x} y={click.y}>
                   +{tapSpeed}
@@ -386,7 +384,7 @@ const Earn = () => {
             <p className="text-center text-lg px-2 py-1 bg-[#00000044] rounded-md"> {tapped} Clicks / { tapLimit } Taps Limit</p>
           </div>
           <div className='flex w-full px-1 justify-between'>
-            <img src="/assets/img/reward.png" alt='Default User' className='w-[60px] h-[72px] cursor-pointer mt-[-100px]' onClick={handleRewardOpen}/>
+            <img src="/assets/img/reward.png" alt='Default User' className='w-[60px] h-[72px] cursor-pointer mt-[-110px]' onClick={handleRewardOpen}/>
             <div className="flex flex-col border bg-[#b0f3b688] rounded-lg relative cursor-pointer mt-[-120px] h-fit px-1 hover:bg-[#5bb96388] border-b-2 shadow" onClick={handleEnergy} style={{visibility: mine && mine.lifeItems == 0 ? "hidden" : "visible"}}>
               <img src="/assets/img/heart.png" alt='weapon' className="w-[40px] h-[40px] p-[4px]"/>
               <p className='text-deep-orange-900 font-bold text-[14px]'>(+100)</p>

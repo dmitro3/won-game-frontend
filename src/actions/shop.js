@@ -18,7 +18,6 @@ export const viewItems = () => async (dispatch, getState) => {
 };
 
 export const makeItem = (itemData) => async (dispatch, getState) => {
-  console.log("itemData", itemData);
   let state = getState();
   try {
     const res = await api(`${serverUrl}/shop/new`, 'post', itemData, state.other.token);
@@ -26,7 +25,6 @@ export const makeItem = (itemData) => async (dispatch, getState) => {
       type: MAKE_ITEM,
       payload: res.data
     });
-    console.log("new item", res.data);
   } catch (err) {
     console.log(err);
   }

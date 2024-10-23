@@ -46,7 +46,6 @@ const BuyToken = ({onSubmit, onClose}) => {
     }, [earnData]);
 
     useEffect(() => {
-        console.log("User Data", userData);
     }, [userData])
 
     const handleWallet = useCallback(async () => {

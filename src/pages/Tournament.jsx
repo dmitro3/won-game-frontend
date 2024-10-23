@@ -25,11 +25,10 @@ const Tournament = () => {
         dispatch(setFightMonster(monster));
         nav("/home/challenge");
     }
-
     
     return (
         <Animate>
-            <div className="max-w-sm mx-auto bg-[#69423E] text-white p-6 h-full overflow-y-auto">
+            <div className="max-w-sm mx-auto bg-[#69423E] text-white p-6 h-full overflow-y-auto pb-[100px]">
 
                 <Typography variant="h3" color="white" className="text-center font-bold mb-6">
                     Tournament

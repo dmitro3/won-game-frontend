@@ -62,6 +62,7 @@ const Leaderboard = () => {
                             </div>
                         )
                     ))}
+                    
                 </div>
             </div>
         </Animate>

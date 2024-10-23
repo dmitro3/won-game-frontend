@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Button } from "@material-tailwind/react";
 import { updateUser, viewUser } from '../actions/earn';
 import { viewActivity, updateActivity } from '../actions/activity';
+
 const Milestones = () => {
     const [coin, setCoin] = useState(0);
     const [level, setLevel] = useState(0);

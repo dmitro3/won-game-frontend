@@ -156,11 +156,9 @@ const Challenge = () => {
         // Set up the interval for sending requests every 2 seconds
         const interval = setInterval(() => {
           if (Object.keys(pendingUpdatesRef.current).length > 0) {
-            console.log("here---", pendingUpdatesRef.current);
             // Send the request with pending updates
             dispatch(updateActivity({ telegramId, data_activity: pendingUpdatesRef.current }));
             setPendingUpdates({}); // Clear pending updates after sending
-            setLastApiCall(Date.now());
           }
         }, 2000); // Set interval to 2 seconds
       
@@ -198,9 +196,6 @@ const Challenge = () => {
     const startFighting = () => {
         setDlgShow(false);
         setBackShow(false);
-        // timePos = 0;
-        // fightDuration = 0;
-
         setBattleTime(() => 0);
         setAniInterval(() => 1);
         
@@ -323,7 +318,7 @@ const Challenge = () => {
             <div className="max-w-sm mx-auto bg-[#64ECEE55] bg-fixed text-white overflow-y-auto relative bg-[url('/assets/img/fields/6.png')] bg-cover bg-center min-h-screen">
                 {
                 dlgShow && 
-                <div className="w-full h-full p-2 z-10 bg-[#000E] absolute bg-[url('/assets/img/bg_vs.png')] bg-center bg-contain bg-no-repeat">
+                <div className="w-full h-full p-2 z-10 bg-[#000E] absolute bg-[url('/assets/img/bg_vs.png')] bg-cover bg-center min-h-screen">
                     <div className="bg-blue-gray-500top-0 left-0 z-40 p-2">
                         <div className="flex flex-center justify-between items-center mt-[20px] px-3">
                             <div className="flex flex-col justify-start border-[5px] border-blue-500 py-4 px-2 rounded-lg bg-[#6CF47F66]">

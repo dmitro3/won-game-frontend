@@ -56,7 +56,6 @@ const TouchPan = () => {
       dispatch(viewUser());
       dispatch(viewActivity());
   },[]);
-  console.log("levelData---", levelData);
   const isEmpty = (val) => {
     if (!val) return true;
     if (Object.keys(val).length > 0) return false;
@@ -93,7 +92,6 @@ const TouchPan = () => {
       handleShowPayment();
     }
     else {
-      console.log(next.levelIndex);
       setCoin((val)=> val-next.tapBalanceRequired);
       dispatch(updateUser({levelIndex: next.levelIndex, tokens: coin - next.tapBalanceRequired, energyLimit: next.energy}));
       dispatch(updateActivity({tapLimit: next.tapLimit}));
@@ -109,7 +107,6 @@ const TouchPan = () => {
 
   const handleClick = (e) => {
     if (tapLimit <= 0) return;
-    console.log("tapSpeed---", tapSpeed);
     setTapped(prev => prev + tapSpeed);
     setTapLimit(prev => prev - tapSpeed);
     dispatch(updateActivity({tapLimit: tapLimit - tapSpeed}));
