@@ -1,18 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import {
-    Button,
-    Dialog,
-    DialogHeader,
-    DialogBody,
-    DialogFooter,
-    IconButton,
-    Typography,
-    MenuItem,
-  } from "@material-tailwind/react";
+import { Typography } from "@material-tailwind/react";
 import Animate from "../components/Animate";
 import { useDispatch, useSelector } from 'react-redux';
 import { isSafeValue } from '../utils';
 import { updateUser } from '../actions/earn';
+import { showLoading } from '../actions/other';
 import { useTonAddress, useTonConnectModal, useTonConnectUI } from "@tonconnect/ui-react";
 
 
@@ -39,6 +31,8 @@ const BuyToken = ({onSubmit, onClose}) => {
     const [attack2, setAttack2] = useState(0);
     const [defence2, setDefence2] = useState(0);
     const [life2, setLife2] = useState(0);
+    const telegramId = useSelector((state)=> state.other.telegramId);
+    const username = useSelector((state)=> state.other.username);
 
     useEffect(() => {
         console.log("User Data", userData);
@@ -72,6 +66,10 @@ const BuyToken = ({onSubmit, onClose}) => {
     }
 
     const claimItems = (type) => {
+        if (type == 0 && attack2 == 0) return;
+        if (type == 1 && defence2 == 0) return;
+        if (type == 2 && life2 == 0) return;
+        dispatch(showLoading(true));
         let amount = 0;
         let tokensNeeded = 0;
         let key = '';

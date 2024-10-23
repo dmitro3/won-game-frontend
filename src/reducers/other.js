@@ -1,9 +1,10 @@
-import { LOAD_MONSTERS, SET_RANKING, SET_TARGET_MONSTER, SHOW_PAYMENT, SET_TELEGRAM_CONFIG, SET_API_TOKEN, ADD_LEVEL, ADD_MONSTER, ADD_CHALLENGE } from '../constants/otherConstants';
+import { LOAD_MONSTERS, SET_RANKING, SET_TARGET_MONSTER, SHOW_PAYMENT, SHOW_LOADING, SET_TELEGRAM_CONFIG, SET_API_TOKEN, ADD_LEVEL, ADD_MONSTER, ADD_CHALLENGE } from '../constants/otherConstants';
 import { telegramId, username } from '../utils/constants';
 const initialState = {
 	ranking: [],
 	monster: [],
 	showPayment: false,
+	showLoading: false,
 	fightMonster: null,
 	telegramId: telegramId,
 	username: username,
@@ -40,6 +41,11 @@ const otherReducer = (state = initialState, action) => {
 			return {
 				...state,
 				showPayment: payload,
+			};
+		case SHOW_LOADING:
+			return {
+				...state,
+				showLoading: payload,
 			};
 		case SET_TARGET_MONSTER:
 			return {

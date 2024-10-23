@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { viewUser, updateUser, updateToken } from '../actions/earn';
 import { viewAll } from '../actions/mine';
 import { viewActivity, updateActivity } from '../actions/activity';
-import { showPayment, getChallenge } from '../actions/other';
+import { showPayment, getChallenge, showLoading } from '../actions/other';
 import { useNavigate } from 'react-router-dom';
 import { isSafeValue } from '../utils';
 
@@ -56,6 +56,10 @@ const Earn = () => {
   const levelData = useSelector((state)=> state.earn.level);
   const telegramId = useSelector((state)=> state.other.telegramId);
   const username = useSelector((state)=> state.other.username);
+
+  const [pendingUpdates, setPendingUpdates] = useState({}); // For debouncing the API call
+  const [lastApiCall, setLastApiCall] = useState(Date.now());
+
   const nav = useNavigate();
   
   useEffect(() => {
@@ -134,17 +138,35 @@ const Earn = () => {
     setRewardOpen((cur) => !cur);
   }
 
+  useEffect(() => {
+    const timer = setInterval(() => {
+      if (Date.now() - lastApiCall >= 3000 && Object.keys(pendingUpdates).length > 0) {
+        console.log("here", pendingUpdates);
+        // Make the API request here with the pending updates
+        dispatch(updateActivity({ telegramId, data_activity: pendingUpdates }));
+
+        // Clear pending updates
+        setPendingUpdates({});
+        setLastApiCall(Date.now());
+      }
+    }, 3000);
+
+    return () => clearInterval(timer);
+  }, [pendingUpdates, lastApiCall]);
+
   const handleClick = (e) => {
     if (tapLimit <= 0) return;
-    setCounts((prev) => {
-      const newCount = prev + tapSpeed;
-      return newCount;
-    });
+
+    setCounts(prev => prev + tapSpeed);
     setTapped(prev => prev + tapSpeed);
     
     setTapLimit(prev => prev - tapSpeed);
-    let data_activity = {tapLimit: tapLimit - tapSpeed};
-    dispatch(updateActivity({telegramId, data_activity}));
+    console.log("tapLimit", tapLimit);
+    setPendingUpdates(prev => ({
+      ...prev,
+      tapLimit: tapLimit-tapSpeed
+    }));
+
     if (currentEnergy < totalEnergy) {
       setCurrentEnergy(prev => prev + tapSpeed);
       let data = {currentEnergy: currentEnergy + tapSpeed, levelIndex: level, points: counts + tapSpeed };
@@ -188,8 +210,8 @@ const Earn = () => {
     setClicks((prevClicks) => [...prevClicks, newClick]);
     // Remove the click after the animation duration
     setTimeout(() => {
-    setClicks((prevClicks) =>
-        prevClicks.filter((click) => click.id !== newClick.id)
+      setClicks((prevClicks) =>
+          prevClicks.filter((click) => click.id !== newClick.id)
     );
     }, 1000); // Match this duration with the animation duration
   };

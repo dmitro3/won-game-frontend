@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { LOAD_MONSTERS, SHOW_PAYMENT, SET_RANKING, SET_TARGET_MONSTER, SET_TELEGRAM_CONFIG, SET_API_TOKEN, ADD_LEVEL, ADD_MONSTER, ADD_CHALLENGE } from '../constants/otherConstants';
+import { LOAD_MONSTERS, SHOW_PAYMENT, SET_RANKING, SET_TARGET_MONSTER, SET_TELEGRAM_CONFIG, SET_API_TOKEN, ADD_LEVEL, ADD_MONSTER, ADD_CHALLENGE, SHOW_LOADING } from '../constants/otherConstants';
 import {
   baseUrl,
   serverUrl
@@ -90,6 +90,13 @@ export const addChallenge = (itemData) => async (dispatch, getState) => {
 export const showPayment = (value) => dispatch => {
   dispatch({
     type: SHOW_PAYMENT,
+    payload: value,
+  });
+};
+
+export const showLoading = (value) => dispatch => {
+  dispatch({
+    type: SHOW_LOADING,
     payload: value,
   });
 };

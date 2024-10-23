@@ -291,7 +291,7 @@ const Challenge = () => {
     return (
         <Animate>
             
-            <div className="max-w-sm mx-auto bg-[#64ECEE55] bg-fixed text-white h-full overflow-y-auto relative bg-[url('/assets/img/fields/6.png')] bg-contain bg-center bg-no-repeat">
+            <div className="max-w-sm mx-auto bg-[#64ECEE55] bg-fixed text-white overflow-y-auto relative bg-[url('/assets/img/fields/6.png')] bg-cover bg-center h-screen w-full">
                 {
                 dlgShow && 
                 <div className="w-full h-full p-2 z-10 bg-[#000E] absolute bg-[url('/assets/img/bg_vs.png')] bg-center bg-contain bg-no-repeat">
