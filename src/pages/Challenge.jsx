@@ -28,7 +28,7 @@ const Challenge = () => {
     const [backShow, setBackShow] = useState(false);
     const [isWin, setIsWin] = useState(0);
     const [plusAttr, setPlusAttr] = useState([0,0,0]);
-    const boost = [ 40, 30, 200 ];
+    const boost = [ 40, 30, 100 ];
     const nav = useNavigate();
 
     const dispatch = useDispatch();
@@ -105,7 +105,7 @@ const Challenge = () => {
             else if (equip.type == 'defence') defence = equip.attribute;
         });
 
-        if (health < userData.currentEnergy) health = userData.energyLimit;
+        if (health < userData.energyLimit) health = userData.energyLimit;
         if (attack <= 0) attack = 3;
         if (defence <= 0) defence = 1;
 
@@ -276,7 +276,7 @@ const Challenge = () => {
             return val;
         });
         setMine(cur => {
-            let curHealth = cur.curHealth + boost[2];
+            let curHealth = (cur.curHealth + boost[2] > cur.totalHealth) ? cur.totalHealth : cur.curHealth + boost[2];
             let lifeItems = cur.lifeItems - 1;
             let data = { levelIndex: userData.levelIndex, lifeItems: lifeItems };
             dispatch(updateUser({ telegramId, data }));
@@ -503,17 +503,20 @@ const Challenge = () => {
                     </div>
 
                     <div className="flex gap-5 mt-[60px] pl-4">
-                        <div className="flex flex-col border bg-[#b0f3b688] rounded-lg relative cursor-pointer" onClick={handleAttack} style={{visibility: mine && mine.attackItems == 0 ? "hidden" : "visible"}}>
+                        <div className="flex flex-col border bg-[#b0f3b688] rounded-lg relative cursor-pointer px-1 hover:bg-[#5bb96388]" onClick={handleAttack} style={{visibility: mine && mine.attackItems == 0 ? "hidden" : "visible"}}>
                             <img src="/assets/weapon/weapon8.png" alt='weapon' className="w-[40px] h-[40px] p-[4px]"/>
-                            <p className='text-deep-orange-900 font-extrabold text-[16px]'>{mine && mine.attackItems}</p>
+                            <p className='text-deep-orange-900 font-bold text-[14px]'>(+{boost[0]})</p>
+                            <p className='text-deep-orange-900 font-extrabold text-[16px] border-t-2'>{mine && mine.attackItems}</p>
                         </div>
-                        <div className="flex flex-col border bg-[#b0f3b688] rounded-lg relative cursor-pointer" onClick={handleDefence} style={{visibility: mine && mine.defenceItems == 0 ? "hidden" : "visible"}}>
+                        <div className="flex flex-col border bg-[#b0f3b688] rounded-lg relative cursor-pointer px-1 hover:bg-[#5bb96388]" onClick={handleDefence} style={{visibility: mine && mine.defenceItems == 0 ? "hidden" : "visible"}}>
                             <img src="/assets/shield/shield6.png" alt='weapon' className="w-w-[40px] h-[40px] p-[4px]"/>
-                            <p className='text-deep-orange-900 font-extrabold text-[16px]'>{mine && mine.defenceItems}</p>
+                            <p className='text-deep-orange-900 font-bold text-[14px]'>(+{boost[1]})</p>
+                            <p className='text-deep-orange-900 font-extrabold text-[16px] border-t-2'>{mine && mine.defenceItems}</p>
                         </div>
-                        <div className="flex flex-col border bg-[#b0f3b688] rounded-lg relative cursor-pointer" onClick={handleEnergy} style={{visibility: mine && mine.lifeItems == 0 ? "hidden" : "visible"}}>
+                        <div className="flex flex-col border bg-[#b0f3b688] rounded-lg relative cursor-pointer px-1 hover:bg-[#5bb96388]" onClick={handleEnergy} style={{visibility: mine && mine.lifeItems == 0 ? "hidden" : "visible"}}>
                             <img src="/assets/img/heart.png" alt='weapon' className="w-[40px] h-[40px] p-[4px]"/>
-                            <p className='text-deep-orange-900 font-extrabold text-[16px]'>{mine && mine.lifeItems}</p>
+                            <p className='text-deep-orange-900 font-bold text-[14px]'>(+{boost[2]})</p>
+                            <p className='text-deep-orange-900 font-extrabold text-[16px] border-t-2'>{mine && mine.lifeItems}</p>
                         </div>
                         <div className="flex gap-1 items-center">
                             <img src="/assets/img/platinum.webp" alt='coin' className="w-[100px] h-[60px] pl-10 cursor-pointer" onClick={handleShoot}/>

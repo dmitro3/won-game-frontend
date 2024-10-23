@@ -102,20 +102,24 @@ const Earn = () => {
   
   useEffect(() => {
     let equipped = mineData.filter((item) => item.isWear);
-    let attack = 0, defence = 0;
+    let attack = 0, defence = 0, health = 0, avatar = "";
     equipped.forEach((equip) => {
-        if (equip.type == 'attack') attack = equip.attribute;
+        if (equip.type == 'character') {health = equip.energy; avatar=equip.imageSrc;}
+        else if (equip.type == 'attack') attack = equip.attribute;
         else if (equip.type == 'defence') defence = equip.attribute;
     });
-
+    if (health < userData.energyLimit) health = userData.energyLimit;
     if (attack <= 0) attack = 3;
     if (defence <= 0) defence = 1;
 
     let user = {
         ...userData,
+        curHealth: userData.currentEnergy,
+        totalHealth: health,
         attack, defence
     };
     setMine(user);
+    setTotalEnergy(health);
   }, [userData, mineData]);
 
   const updatelevel = () => {
@@ -124,7 +128,7 @@ const Earn = () => {
     }
     else {
       setCoin((val)=> val-next.tapBalanceRequired);
-      let data = {levelIndex: next.levelIndex, tokens: coin - next.tapBalanceRequired, energyLimit: next.energy};
+      let data = {levelIndex: next.levelIndex, tokens: coin - next.tapBalanceRequired, energyLimit: totalEnergy + (next.energy - prev.energy)};
       dispatch(updateUser({telegramId, data}));
       let data_activity = {tapLimit: next.tapLimit};
       dispatch(updateActivity({telegramId, data_activity}));
@@ -233,6 +237,13 @@ const Earn = () => {
     dispatch(showPayment(true));
   }
 
+  const handleEnergy = () => {
+    let curHealth = (currentEnergy + 100 > totalEnergy) ? totalEnergy : currentEnergy + 100;
+    let lifeItems = userData.lifeItems - 1;
+    let data = { levelIndex: userData.levelIndex, currentEnergy: curHealth, lifeItems: lifeItems };
+    dispatch(updateUser({ telegramId, data }));
+  }
+
   return (
     <div className="max-w-sm mx-auto bg-[#69423E] text-white p-6 h-full overflow-y-auto">
       {/* User Info */}
@@ -285,7 +296,7 @@ const Earn = () => {
                     <div className='flex flex-col justify-center p-2 bg-blue-400 lg:px-8 sm:px-1'>
                         <div className='flex justify-center gap-3 rounded-full bg-blue-gray-700 px-4 py-2 mb-2 items-center'>
                             <img src="/assets/img/heart.png" alt='coin' width="14px" height="14px" />
-                            <p className='text-white text-[16px]'>{prev.energy}</p>
+                            <p className='text-white text-[16px]'>{totalEnergy}</p>
                         </div>
                         <div className='flex justify-center gap-3 rounded-full bg-blue-gray-700 px-4 py-2 mb-2 items-center'>
                             <img src="/assets/img/loader.webp" alt='coin' width="14px" height="14px" />
@@ -303,7 +314,7 @@ const Earn = () => {
                     <div className='flex flex-col justify-center p-2 bg-red-400 lg:px-8 sm:px-1'>
                         <div className='flex justify-center gap-3 rounded-full bg-blue-gray-700 px-4 py-2 mb-2 items-center'>
                             <img src="/assets/img/heart.png" alt='coin' width="14px" height="14px" />
-                            <p className='text-white text-[16px]'>{next.energy}</p>
+                            <p className='text-white text-[16px]'>{totalEnergy + (next.energy - prev.energy) }</p>
                         </div>
                         <div className='flex justify-center gap-3 rounded-full bg-blue-gray-700 px-4 py-2 mb-2 items-center'>
                             <img src="/assets/img/loader.webp" alt='coin' width="14px" height="14px" />
@@ -368,8 +379,13 @@ const Earn = () => {
           <div className='flex mt-1'>
             <p className="text-center text-lg px-2 py-1 bg-[#00000044] rounded-md"> {tapped} Clicks / { tapLimit } Taps Limit</p>
           </div>
-          <div className='flex w-full px-1'>
+          <div className='flex w-full px-1 justify-between'>
             <img src="/assets/img/reward.png" alt='Default User' className='w-[60px] h-[72px] cursor-pointer mt-[-100px]' onClick={handleRewardOpen}/>
+            <div className="flex flex-col border bg-[#b0f3b688] rounded-lg relative cursor-pointer mt-[-120px] h-fit px-1 hover:bg-[#5bb96388]" onClick={handleEnergy} style={{visibility: mine && mine.lifeItems == 0 ? "hidden" : "visible"}}>
+              <img src="/assets/img/heart.png" alt='weapon' className="w-[40px] h-[40px] p-[4px]"/>
+              <p className='text-deep-orange-900 font-bold text-[14px]'>(+100)</p>
+              <p className='text-deep-orange-900 font-extrabold text-[16px] border-t-2'>{mine && mine.lifeItems}</p>
+            </div>
             {/* <img src="/assets/img/levelup.png" alt='Default User' className='w-[60px] h-[72px] cursor-pointer mt-[-100px]' onClick={handleOpen}/> */}
           </div>
           
