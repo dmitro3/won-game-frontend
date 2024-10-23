@@ -1,5 +1,5 @@
 import Animate from "../components/Animate";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Progress, Button, Dialog } from "@material-tailwind/react";
 import { useDispatch, useSelector } from 'react-redux';
 import { viewUser, updateUser } from '../actions/earn';
@@ -40,7 +40,7 @@ const Challenge = () => {
     const username = useSelector((state)=> state.other.username);
 
     const [pendingUpdates, setPendingUpdates] = useState({}); // For debouncing the API call
-    const [lastApiCall, setLastApiCall] = useState(Date.now());
+    const pendingUpdatesRef = useRef({});
     
     const shootManSpark = () => {
         setManSparks((prev) => [...prev, { id: Date.now(), position: 80 }]);
@@ -148,28 +148,36 @@ const Challenge = () => {
     }, []);
 
     useEffect(() => {
-        const timer = setInterval(() => {
-          if (Date.now() - lastApiCall >= 1000 && Object.keys(pendingUpdates).length > 0) {
-            // Make the API request here with the pending updates
-            dispatch(updateActivity({ telegramId, data_activity: pendingUpdates }));
-            // Clear pending updates
-            setPendingUpdates({});
+        // Sync the ref with the state
+        pendingUpdatesRef.current = pendingUpdates;
+    }, [pendingUpdates]);
+      
+    useEffect(() => {
+        // Set up the interval for sending requests every 2 seconds
+        const interval = setInterval(() => {
+          if (Object.keys(pendingUpdatesRef.current).length > 0) {
+            console.log("here---", pendingUpdatesRef.current);
+            // Send the request with pending updates
+            dispatch(updateActivity({ telegramId, data_activity: pendingUpdatesRef.current }));
+            setPendingUpdates({}); // Clear pending updates after sending
             setLastApiCall(Date.now());
           }
-        }, 1000);
-    
-        return () => clearInterval(timer);
-    }, [pendingUpdates, lastApiCall]);
+        }, 2000); // Set interval to 2 seconds
+      
+        // Clean up the interval on component unmount
+        return () => clearInterval(interval);
+    }, []); // Run once when the component mounts
     
 
     const handleShoot = () => {
         if (tapLimit <= 0) return;
         shootManSpark(); // Shoot a spark on each button click
         setTapLimit(prev => prev - 1);
-        setPendingUpdates(prev => ({
-            ...prev,
-            tapLimit: tapLimit - 1
-        }));
+        const newUpdates = {
+            ...pendingUpdatesRef.current,
+            tapLimit: tapLimit - 1,
+        };
+        setPendingUpdates(newUpdates);
     };
 
     useEffect(() => {

@@ -60,7 +60,7 @@ const Earn = () => {
   const username = useSelector((state)=> state.other.username);
 
   const [pendingUpdates, setPendingUpdates] = useState({}); // For debouncing the API call
-  const [lastApiCall, setLastApiCall] = useState(Date.now());
+  const pendingUpdatesRef = useRef({});
 
   const nav = useNavigate();
   
@@ -145,77 +145,84 @@ const Earn = () => {
   }
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      if (Date.now() - lastApiCall >= 2000 && Object.keys(pendingUpdates).length > 0) {
-        // Make the API request here with the pending updates
-        dispatch(updateActivity({ telegramId, data_activity: pendingUpdates }));
-        // Clear pending updates
-        setPendingUpdates({});
+    // Sync the ref with the state
+    pendingUpdatesRef.current = pendingUpdates;
+  }, [pendingUpdates]);
+  
+  useEffect(() => {
+    // Set up the interval for sending requests every 2 seconds
+    const interval = setInterval(() => {
+      if (Object.keys(pendingUpdatesRef.current).length > 0) {
+        console.log("here---", pendingUpdatesRef.current);
+        // Send the request with pending updates
+        dispatch(updateActivity({ telegramId, data_activity: pendingUpdatesRef.current }));
+        setPendingUpdates({}); // Clear pending updates after sending
         setLastApiCall(Date.now());
       }
-    }, 2000);
-
-    return () => clearInterval(timer);
-  }, [pendingUpdates, lastApiCall]);
-
+    }, 2000); // Set interval to 2 seconds
+  
+    // Clean up the interval on component unmount
+    return () => clearInterval(interval);
+  }, []); // Run once when the component mounts
+  
   const handleClick = (e) => {
     if (tapLimit <= 0) return;
-
-    setCounts(prev => prev + tapSpeed);
-    setTapped(prev => prev + tapSpeed);
-    
-    setTapLimit(prev => prev - tapSpeed);
-    setPendingUpdates(prev => ({
-      ...prev,
-      tapLimit: tapLimit-tapSpeed
-    }));
-
+  
+    setCounts((prev) => prev + tapSpeed);
+    setTapped((prev) => prev + tapSpeed);
+    setTapLimit((prev) => prev - tapSpeed);
+  
+    // Update pending updates (use ref for the current value)
+    const newUpdates = {
+      ...pendingUpdatesRef.current,
+      tapLimit: tapLimit - tapSpeed,
+    };
+    setPendingUpdates(newUpdates);
+  
     if (currentEnergy < totalEnergy) {
-      setCurrentEnergy(prev => prev + tapSpeed);
-      let data = {currentEnergy: currentEnergy + tapSpeed, levelIndex: level, points: counts + tapSpeed };
+      setCurrentEnergy((prev) => prev + tapSpeed);
+      let data = { currentEnergy: currentEnergy + tapSpeed, levelIndex: level, points: counts + tapSpeed };
       dispatch(updateUser({ telegramId, data }));
     }
-    
+  
     const { offsetX, offsetY, target } = e.nativeEvent;
     const { clientWidth, clientHeight } = target;
-
+  
     const horizontalMidpoint = clientWidth;
     const verticalMidpoint = clientHeight;
-
+  
     const animationClass =
-    offsetX < horizontalMidpoint
+      offsetX < horizontalMidpoint
         ? "wobble-left"
         : offsetX > horizontalMidpoint
         ? "wobble-right"
         : offsetY < verticalMidpoint
         ? "wobble-top"
         : "wobble-bottom";
-
+  
     imageRef.current.classList.remove(
-        "wobble-top",
-        "wobble-bottom",
-        "wobble-left",
-        "wobble-right"
+      "wobble-top",
+      "wobble-bottom",
+      "wobble-left",
+      "wobble-right"
     );
-
     imageRef.current.classList.add(animationClass);
-
+  
     setTimeout(() => {
-        imageRef.current.classList.remove(animationClass);
+      imageRef.current.classList.remove(animationClass);
     }, 500);
-
+  
     const rect = e.target.getBoundingClientRect();
     const newClick = {
-        id: Date.now(), // Unique identifier
-        x: e.clientX - (rect.left),
-        y: e.clientY - (rect.bottom/4*3),
+      id: Date.now(), // Unique identifier
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.bottom / 4 * 3,
     };
     setClicks((prevClicks) => [...prevClicks, newClick]);
+  
     // Remove the click after the animation duration
     setTimeout(() => {
-      setClicks((prevClicks) =>
-          prevClicks.filter((click) => click.id !== newClick.id)
-    );
+      setClicks((prevClicks) => prevClicks.filter((click) => click.id !== newClick.id));
     }, 1000); // Match this duration with the animation duration
   };
 
@@ -380,7 +387,7 @@ const Earn = () => {
           </div>
           <div className='flex w-full px-1 justify-between'>
             <img src="/assets/img/reward.png" alt='Default User' className='w-[60px] h-[72px] cursor-pointer mt-[-100px]' onClick={handleRewardOpen}/>
-            <div className="flex flex-col border bg-[#b0f3b688] rounded-lg relative cursor-pointer mt-[-120px] h-fit px-1 hover:bg-[#5bb96388]" onClick={handleEnergy} style={{visibility: mine && mine.lifeItems == 0 ? "hidden" : "visible"}}>
+            <div className="flex flex-col border bg-[#b0f3b688] rounded-lg relative cursor-pointer mt-[-120px] h-fit px-1 hover:bg-[#5bb96388] border-b-2 shadow" onClick={handleEnergy} style={{visibility: mine && mine.lifeItems == 0 ? "hidden" : "visible"}}>
               <img src="/assets/img/heart.png" alt='weapon' className="w-[40px] h-[40px] p-[4px]"/>
               <p className='text-deep-orange-900 font-bold text-[14px]'>(+100)</p>
               <p className='text-deep-orange-900 font-extrabold text-[16px] border-t-2'>{mine && mine.lifeItems}</p>
