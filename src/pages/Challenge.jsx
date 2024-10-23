@@ -236,12 +236,14 @@ const Challenge = () => {
                     setMine(cur => {
                         let curHealth = cur.curHealth - monsterAttack * 3;
                         if (curHealth < 0) curHealth = 0;
-            
+                        let data = { levelIndex: userData.levelIndex, currentEnergy: curHealth };
+                        dispatch(updateUser({ telegramId, data }));
                         return {
                             ...cur,
                             curHealth,
                         }
                     });
+
                     return false;
                 }
                 return true;

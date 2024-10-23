@@ -236,8 +236,6 @@ const Earn = () => {
     dispatch(showPayment(true));
   }
 
-  const notify = () => toast("Wow so easy!");
-
   const handleEnergy = () => {
     let curHealth = (currentEnergy + 100 > totalEnergy) ? totalEnergy : currentEnergy + 100;
     let lifeItems = userData.lifeItems - 1;
