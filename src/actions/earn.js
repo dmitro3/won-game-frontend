@@ -36,14 +36,18 @@ export const updateUser = ({telegramId, data}) => async (dispatch, getState) => 
 };
 
 export const updateToken = ({telegramId, tokenToAdd}) => async (dispatch, getState) => {
-  let state = getState();
-  try {
-    const res = await api(`${serverUrl}/user/token/${telegramId}`, 'put', {tokenToAdd}, state.other.token);
-    dispatch({
-      type: UPDATE_TOKEN,
-      payload: res.data,
-    });
-  } catch (err) {
-    console.log(err);
-  }
+  return new Promise(async (resolve, reject) => {
+    let state = getState();
+    try {
+      const res = await api(`${serverUrl}/user/token/${telegramId}`, 'put', {tokenToAdd}, state.other.token);
+      dispatch({
+        type: UPDATE_TOKEN,
+        payload: res.data,
+      });
+      resolve(JSON.stringify(res.data));
+    } catch (err) {
+      reject(err);
+    }
+  })
+  
 };

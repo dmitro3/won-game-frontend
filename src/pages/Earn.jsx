@@ -9,6 +9,8 @@ import { viewActivity, updateActivity } from '../actions/activity';
 import { showPayment, getChallenge, showLoading } from '../actions/other';
 import { useNavigate } from 'react-router-dom';
 import { isSafeValue } from '../utils';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const slideUp = keyframes`
     0% {
@@ -144,16 +146,14 @@ const Earn = () => {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      if (Date.now() - lastApiCall >= 3000 && Object.keys(pendingUpdates).length > 0) {
-        console.log("here", pendingUpdates);
+      if (Date.now() - lastApiCall >= 2000 && Object.keys(pendingUpdates).length > 0) {
         // Make the API request here with the pending updates
         dispatch(updateActivity({ telegramId, data_activity: pendingUpdates }));
-
         // Clear pending updates
         setPendingUpdates({});
         setLastApiCall(Date.now());
       }
-    }, 3000);
+    }, 2000);
 
     return () => clearInterval(timer);
   }, [pendingUpdates, lastApiCall]);
@@ -165,7 +165,6 @@ const Earn = () => {
     setTapped(prev => prev + tapSpeed);
     
     setTapLimit(prev => prev - tapSpeed);
-    console.log("tapLimit", tapLimit);
     setPendingUpdates(prev => ({
       ...prev,
       tapLimit: tapLimit-tapSpeed
@@ -236,6 +235,8 @@ const Earn = () => {
   const handleShowPayment = () => {
     dispatch(showPayment(true));
   }
+
+  const notify = () => toast("Wow so easy!");
 
   const handleEnergy = () => {
     let curHealth = (currentEnergy + 100 > totalEnergy) ? totalEnergy : currentEnergy + 100;
@@ -386,6 +387,7 @@ const Earn = () => {
               <p className='text-deep-orange-900 font-bold text-[14px]'>(+100)</p>
               <p className='text-deep-orange-900 font-extrabold text-[16px] border-t-2'>{mine && mine.lifeItems}</p>
             </div>
+            
             {/* <img src="/assets/img/levelup.png" alt='Default User' className='w-[60px] h-[72px] cursor-pointer mt-[-100px]' onClick={handleOpen}/> */}
           </div>
           

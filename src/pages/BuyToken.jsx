@@ -1,11 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { Typography } from "@material-tailwind/react";
-import Animate from "../components/Animate";
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { isSafeValue } from '../utils';
-import { updateUser } from '../actions/earn';
-import { showLoading } from '../actions/other';
+import { Typography, useMenu } from "@material-tailwind/react";
 import { useTonAddress, useTonConnectModal, useTonConnectUI } from "@tonconnect/ui-react";
+import BigNumber from "bignumber.js";
+
+// components
+import Animate from "../components/Animate";
+
+// utils
+import { isSafeValue } from '../utils';
+import showToast from '../utils/toast';
+
+// actions
+import { updateUser } from '../actions/earn';
+import { updateToken } from '../actions/earn';
 
 
 const BuyToken = ({onSubmit, onClose}) => {
@@ -17,7 +25,8 @@ const BuyToken = ({onSubmit, onClose}) => {
     ]
 
     const dispatch = useDispatch();
-    const userData = useSelector((state) => state.earn.user);
+    const earnData = useSelector((state) => state.earn);
+    const telegramId = useSelector((state)=> state.other.telegramId);
     
     //telegram wallet
     const { open: openTonConnectModal } = useTonConnectModal();
@@ -31,30 +40,59 @@ const BuyToken = ({onSubmit, onClose}) => {
     const [attack2, setAttack2] = useState(0);
     const [defence2, setDefence2] = useState(0);
     const [life2, setLife2] = useState(0);
-    const telegramId = useSelector((state)=> state.other.telegramId);
-    const username = useSelector((state)=> state.other.username);
+
+    const userData = useMemo(() => {
+        return earnData.user
+    }, [earnData]);
 
     useEffect(() => {
         console.log("User Data", userData);
     }, [userData])
 
-    const handleWallet = () => {
-        if (!tonAddress) {
-            openTonConnectModal();
-            return;
+    const handleWallet = useCallback(async () => {
+        if (isNaN(coin) || coin <= 0) {
+            return showToast("error", "Please enter valid amount of coins to clain tokens.");
         }
-    }
+        if (!tonAddress) {
+            return openTonConnectModal();
+        }
+        const result = await tonConnectUI.sendTransaction({
+            validUntil: Math.floor(Date.now() / 1000) + 60,
+            messages: [
+              {
+                address: "0QB1do72vGlM0RfWI8n8_9xzHLtrQkJvTZ0tffrcrCrTq0tt",
+                amount: new BigNumber(coin).multipliedBy(1e9).toFixed(0),
+              },
+            ],
+        });
+        if (result.boc) {
+            dispatch(updateToken({telegramId, tokenToAdd: token})).then((message) => {
+                const { status, data } = JSON.parse(message);
+                try {
+                    if (status) {
+                        showToast("success", "Claimed successfully!");
+                    } else {
+                        showToast("error", data);
+                    }
+                } catch (error) {
+                    showToast("error", "Something went wrong");
+                }
+            });
+        } else {
+            showToast("error", "Something went wrong");
+        }
+    }, [coin, token, tonAddress, dispatch, updateToken]);
 
     const handleChange = (evt, type) => {
 
-        let val = parseInt(evt.target.value);
+        let val = Number(evt.target.value);
         if (isNaN(val)) val = 0;
 
         if (type == 1) {
             setToken(evt.target.value);
             setCoin(val / 10);
         } else if (type == 2) {
-            setToken(val / 10);
+            setToken(val * 10);
             setCoin(evt.target.value);
         } else if (type == 3) {
             setAttack2(val);
@@ -69,7 +107,7 @@ const BuyToken = ({onSubmit, onClose}) => {
         if (type == 0 && attack2 == 0) return;
         if (type == 1 && defence2 == 0) return;
         if (type == 2 && life2 == 0) return;
-        dispatch(showLoading(true));
+        // dispatch(showLoading(true));
         let amount = 0;
         let tokensNeeded = 0;
         let key = '';
@@ -88,10 +126,11 @@ const BuyToken = ({onSubmit, onClose}) => {
             if (type == 0)      setAttack2(0);
             else if (type == 1) setDefence2(0);
             else if (type == 2) setLife2(0);
-    
+            showToast("success", "Buy successfully!");
         } else {
             setNeedShow(true);
         }
+        
     }
 
     return (

@@ -2,6 +2,7 @@ import {
     createBrowserRouter,
     RouterProvider,
 } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
 
 import './App.css';
 
@@ -17,6 +18,8 @@ import Leaderboards from "./pages/Leaderboards";
 import Tournament from "./pages/Tournament";
 import BuyToken from "./pages/BuyToken";
 import { TonConnectUIProvider } from "@tonconnect/ui-react";
+
+import "react-toastify/dist/ReactToastify.css";
 
 const router = createBrowserRouter([
     {
@@ -68,9 +71,12 @@ const router = createBrowserRouter([
   
 function App() {
     return (
-        <TonConnectUIProvider manifestUrl="https://localhost:5173/tonconnect-manifest.json" >
-            <RouterProvider router={router} />
-        </TonConnectUIProvider>
+        <>
+            <TonConnectUIProvider manifestUrl={location.protocol + "//" + location.hostname + "/tonconnect-manifest.json"}>
+                <RouterProvider router={router} />
+            </TonConnectUIProvider>
+            <ToastContainer />
+        </>
     );
 }
 

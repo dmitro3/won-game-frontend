@@ -38,6 +38,9 @@ const Challenge = () => {
     const selMonster = useSelector((state) => state.other.fightMonster);
     const telegramId = useSelector((state)=> state.other.telegramId);
     const username = useSelector((state)=> state.other.username);
+
+    const [pendingUpdates, setPendingUpdates] = useState({}); // For debouncing the API call
+    const [lastApiCall, setLastApiCall] = useState(Date.now());
     
     const shootManSpark = () => {
         setManSparks((prev) => [...prev, { id: Date.now(), position: 80 }]);
@@ -144,12 +147,29 @@ const Challenge = () => {
         };
     }, []);
 
+    useEffect(() => {
+        const timer = setInterval(() => {
+          if (Date.now() - lastApiCall >= 1000 && Object.keys(pendingUpdates).length > 0) {
+            // Make the API request here with the pending updates
+            dispatch(updateActivity({ telegramId, data_activity: pendingUpdates }));
+            // Clear pending updates
+            setPendingUpdates({});
+            setLastApiCall(Date.now());
+          }
+        }, 1000);
+    
+        return () => clearInterval(timer);
+    }, [pendingUpdates, lastApiCall]);
+    
+
     const handleShoot = () => {
         if (tapLimit <= 0) return;
         shootManSpark(); // Shoot a spark on each button click
         setTapLimit(prev => prev - 1);
-        let data_activity = {tapLimit: tapLimit - 1};
-        dispatch(updateActivity({telegramId, data_activity}));
+        setPendingUpdates(prev => ({
+            ...prev,
+            tapLimit: tapLimit - 1
+        }));
     };
 
     useEffect(() => {
@@ -161,7 +181,6 @@ const Challenge = () => {
             clearInterval(monsterInterval);
             clearInterval(timerInterval);
             handleOpen();
-
             setBackShow(() => true);
         } else if (!dlgShow) {
             interval = setTimeout(() => doFightAction(), timeDuration);
@@ -190,7 +209,7 @@ const Challenge = () => {
     
         setManSparks((prevSparks) => {
             return prevSparks.filter((spark) => {
-                if (spark.position >= 310) {
+                if (spark.position >= 290) {
                     let rand = Math.random();
                     let manAttack = Math.floor(mine.attack * 0.85 - monster.defence * (1 + rand));
                     if (manAttack < 0) manAttack = 1;
@@ -291,14 +310,14 @@ const Challenge = () => {
     return (
         <Animate>
             
-            <div className="max-w-sm mx-auto bg-[#64ECEE55] bg-fixed text-white overflow-y-auto relative bg-[url('/assets/img/fields/6.png')] bg-cover bg-center h-screen w-full">
+            <div className="max-w-sm mx-auto bg-[#64ECEE55] bg-fixed text-white overflow-y-auto relative bg-[url('/assets/img/fields/6.png')] bg-cover bg-center min-h-screen">
                 {
                 dlgShow && 
                 <div className="w-full h-full p-2 z-10 bg-[#000E] absolute bg-[url('/assets/img/bg_vs.png')] bg-center bg-contain bg-no-repeat">
                     <div className="bg-blue-gray-500top-0 left-0 z-40 p-2">
                         <div className="flex flex-center justify-between items-center mt-[20px] px-3">
                             <div className="flex flex-col justify-start border-[5px] border-blue-500 py-4 px-2 rounded-lg bg-[#6CF47F66]">
-                                <img src={mine ? mine.avatar : "/assets/character/man1.png"} alt='avatar' 
+                                <img src={mine && mine.avatar ? mine.avatar : "/assets/character/man1.png"} alt='avatar' 
                                     className="w-[120px] h-[160px] mx-auto"/>
                                 <div className="flex gap-2 items-center mt-5">
                                     <img src="/assets/img/heart.png" alt='avatar' className="w-[22px] h-[22px]"/>
@@ -353,11 +372,11 @@ const Challenge = () => {
                 </div>
                 }
 
-                <div className='mt-4'>
+                <div className='mt-4 px-2'>
                     <div className="flex justify-between items-center">
                         <div className="p-2 w-full">
                             <div className="flex justify-between px-3">
-                                <img src={mine ? mine.avatar : "/assets/character/man1.png"} alt='avatar' className="w-[32px] h-[40px]"/>
+                                <img src={mine && mine.avatar ? mine.avatar : "/assets/character/man1.png"} alt='avatar' className="w-[32px] h-[40px]"/>
                                 <div>
                                     <div className='flex gap-1 items-center justify-end'>
                                         <img 
@@ -466,16 +485,11 @@ const Challenge = () => {
                        }
                     </Dialog>
 
-                    <div className="border bg-[#0000e2] mt-5 w-fit mx-auto py-1 px-5 text-[24px]" 
-                        style={{visibility: isWin != 0 ? 'visible' : 'hidden'}}>
-                        {backShow && isWin == 1 ? "Win!" : "Lose!"}
-                    </div>
-
-                    <div className="flex justify-between relative h-[200px]">
+                    <div className="flex justify-between relative h-[160px]">
                         <div className="flex gap-1">
                             <img src="/assets/challenge/man1.png" alt='character' className="w-[80px] h-[80px] block" style={{
                                 position: 'absolute',
-                                left: "0px",
+                                left: "10px",
                                 bottom: '-10px',
                             }}/>
                             {manSparks.map((spark, idx) => (
@@ -489,7 +503,7 @@ const Challenge = () => {
                         <div className="flex gap-1">
                             <img src="/assets/challenge/monster1.png" alt='character' className="w-[80px] h-[80px] block" style={{
                                 position: 'absolute',
-                                left: "300px",
+                                left: "280px",
                                 bottom: '-10px',
                             }}/>
                             {monsterSparks.map((spark, idx) => (
@@ -502,7 +516,7 @@ const Challenge = () => {
                         </div>
                     </div>
 
-                    <div className="flex gap-5 mt-[60px] pl-4">
+                    <div className="flex gap-5 mt-[40px] px-4">
                         <div className="flex flex-col border bg-[#b0f3b688] rounded-lg relative cursor-pointer px-1 hover:bg-[#5bb96388]" onClick={handleAttack} style={{visibility: mine && mine.attackItems == 0 ? "hidden" : "visible"}}>
                             <img src="/assets/weapon/weapon8.png" alt='weapon' className="w-[40px] h-[40px] p-[4px]"/>
                             <p className='text-deep-orange-900 font-bold text-[14px]'>(+{boost[0]})</p>
@@ -519,7 +533,7 @@ const Challenge = () => {
                             <p className='text-deep-orange-900 font-extrabold text-[16px] border-t-2'>{mine && mine.lifeItems}</p>
                         </div>
                         <div className="flex gap-1 items-center">
-                            <img src="/assets/img/platinum.webp" alt='coin' className="w-[100px] h-[60px] pl-10 cursor-pointer" onClick={handleShoot}/>
+                            <img src="/assets/img/platinum.webp" alt='coin' className="w-[60px] h-[60px] cursor-pointer" onClick={handleShoot}/>
                             <div className="flex flex-col justify-center">
                                 <p className="text-[36px] font-bold text-white">{tapLimit}</p>
                                 <p className="text-[16px]">Tap Limits</p>

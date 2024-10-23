@@ -22,7 +22,7 @@ const earnReducer = (state = initialState, action) => {
 				level: payload.level
 			};
 		case UPDATE_TOKEN:
-			state.user['tokens'] = payload;
+			state.user['tokens'] = payload.data;
 			return {
 				...state,
 			};
