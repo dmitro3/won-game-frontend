@@ -258,6 +258,7 @@ const Challenge = () => {
     }
 
     const handleAttack = () => {
+        if (cur.attackItems <= 0) return;
         setPlusAttr((val) => {
             val[0] += boost[0];
             return val;
@@ -277,6 +278,7 @@ const Challenge = () => {
     }
 
     const handleDefence = () => {
+        if (cur.defenceItems <= 0) return;
         setPlusAttr((val) => {
             val[1] += boost[1];
             return val;
@@ -295,6 +297,7 @@ const Challenge = () => {
     }
 
     const handleEnergy = () => {
+        if (cur.lifeItems <= 0) return;
         setPlusAttr((val) => {
             val[2] += boost[2];
             return val;

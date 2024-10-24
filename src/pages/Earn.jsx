@@ -242,6 +242,7 @@ const Earn = () => {
   }
 
   const handleEnergy = () => {
+    if (userData.lifeItems <= 0) return;
     let curHealth = (currentEnergy + 100 > totalEnergy) ? totalEnergy : currentEnergy + 100;
     let lifeItems = userData.lifeItems - 1;
     let data = { levelIndex: userData.levelIndex, currentEnergy: curHealth, lifeItems: lifeItems };
