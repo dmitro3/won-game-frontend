@@ -118,7 +118,7 @@ const Earn = () => {
         ...userData,
         curHealth: userData.currentEnergy,
         totalHealth: health,
-        attack, defence
+        attack, defence, avatar
     };
     setMine(user);
     setTotalEnergy(health);
@@ -253,7 +253,7 @@ const Earn = () => {
       {/* User Info */}
       <div className="flex items-center justify-between mb-1">
         <div className='flex gap-2'>
-          <img src='/assets/img/user/male-2.webp' alt='Default User' className='w-[44px] h-[48px] border rounded-lg p-1 bg-blue-gray-600' />
+          <img src={mine && mine.avatar ? mine.avatar : "/assets/character/man1.png"} alt='Default User' className='w-[44px] h-[54px] border rounded-lg bg-blue-gray-600' />
           <div className='flex flex-col'>
             <p className="text-lg font-semibold">{userData.name}</p>
             <div className='flex gap-2'>
