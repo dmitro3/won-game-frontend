@@ -214,7 +214,7 @@ const Challenge = () => {
             return prevSparks.filter((spark) => {
                 if (spark.position >= 290) {
                     let rand = Math.random();
-                    let manAttack = Math.floor(mine.attack * 0.85 - monster.defence * (1 + rand));
+                    let manAttack = Math.floor((mine.attack + plusAttr[0]) * 0.85 - monster.defence * (1 + rand));
                     if (manAttack < 0) manAttack = 1;
                     setMonster(cur => {
                         let curHealth = cur.curHealth - manAttack * 3;
@@ -234,7 +234,7 @@ const Challenge = () => {
             return prevSparks.filter((spark) => {
                 if (spark.position <= 30) {
                     let rand = Math.random();
-                    let monsterAttack = Math.floor(monster.attack + (1 + rand) - mine.defence * 0.8);
+                    let monsterAttack = Math.floor(monster.attack + (1 + rand) - (mine.defence + plusAttr[1]) * 0.8);
                     if (monsterAttack < 0) monsterAttack = 1;
                     setMine(cur => {
                         let curHealth = cur.curHealth - monsterAttack * 3;
@@ -258,7 +258,7 @@ const Challenge = () => {
     }
 
     const handleAttack = () => {
-        if (cur.attackItems <= 0) return;
+        if(mine.attackItems <= 0) return;
         setPlusAttr((val) => {
             val[0] += boost[0];
             return val;
@@ -278,7 +278,7 @@ const Challenge = () => {
     }
 
     const handleDefence = () => {
-        if (cur.defenceItems <= 0) return;
+        if(mine.defenceItems <= 0) return;
         setPlusAttr((val) => {
             val[1] += boost[1];
             return val;
@@ -297,7 +297,7 @@ const Challenge = () => {
     }
 
     const handleEnergy = () => {
-        if (cur.lifeItems <= 0) return;
+        if(mine.lifeItems <= 0) return;
         setPlusAttr((val) => {
             val[2] += boost[2];
             return val;

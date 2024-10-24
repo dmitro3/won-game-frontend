@@ -61,6 +61,8 @@ const Earn = () => {
 
   const [pendingUpdates, setPendingUpdates] = useState({}); // For debouncing the API call
   const pendingUpdatesRef = useRef({});
+  const [pendingUpdates1, setPendingUpdates1] = useState({}); // For debouncing the API call
+  const pendingUpdatesRef1 = useRef({});
 
   const nav = useNavigate();
   
@@ -68,6 +70,7 @@ const Earn = () => {
       dispatch(viewUser({telegramId, username}));
       dispatch(viewActivity({telegramId, username}));
       dispatch(viewAll({telegramId, username}));
+      dispatch(showLoading(true));
   },[]);
 
   const isEmpty = (val) => {
@@ -148,6 +151,11 @@ const Earn = () => {
     // Sync the ref with the state
     pendingUpdatesRef.current = pendingUpdates;
   }, [pendingUpdates]);
+
+  useEffect(() => {
+    // Sync the ref with the state
+    pendingUpdatesRef1.current = pendingUpdates1;
+  }, [pendingUpdates1]);
   
   useEffect(() => {
     // Set up the interval for sending requests every 2 seconds
@@ -157,8 +165,14 @@ const Earn = () => {
         dispatch(updateActivity({ telegramId, data_activity: pendingUpdatesRef.current }));
         setPendingUpdates({}); // Clear pending updates after sending
       }
+      if (Object.keys(pendingUpdatesRef1.current).length > 0) {
+        // Send the request with pending updates
+        console.log("here---", pendingUpdatesRef1.current)
+        dispatch(updateUser({ telegramId, data: pendingUpdatesRef1.current }));
+        setPendingUpdates1({}); // Clear pending updates after sending
+      }
     }, 2000); // Set interval to 2 seconds
-  
+
     // Clean up the interval on component unmount
     return () => clearInterval(interval);
   }, []); // Run once when the component mounts
@@ -169,19 +183,30 @@ const Earn = () => {
     setCounts((prev) => prev + tapSpeed);
     setTapped((prev) => prev + tapSpeed);
     setTapLimit((prev) => prev - tapSpeed);
-  
+    setCurrentEnergy((prev)=> prev + tapSpeed);
     // Update pending updates (use ref for the current value)
     const newUpdates = {
       ...pendingUpdatesRef.current,
       tapLimit: tapLimit - tapSpeed,
     };
     setPendingUpdates(newUpdates);
-  
-    if (currentEnergy < totalEnergy) {
-      setCurrentEnergy((prev) => prev + tapSpeed);
-      let data = { currentEnergy: currentEnergy + tapSpeed, levelIndex: level, points: counts + tapSpeed };
-      dispatch(updateUser({ telegramId, data }));
+
+    if(currentEnergy < totalEnergy) {
+      const newUpdates1 = {
+        ...pendingUpdatesRef1.current,
+        currentEnergy: currentEnergy + tapSpeed, 
+        levelIndex: level, 
+        points: counts + tapSpeed
+      };
+      setPendingUpdates1(newUpdates1);
     }
+    
+  
+    // if (currentEnergy < totalEnergy) {
+    //   setCurrentEnergy((prev) => prev + tapSpeed);
+    //   let data = { currentEnergy: currentEnergy + tapSpeed, levelIndex: level, points: counts + tapSpeed };
+    //   dispatch(updateUser({ telegramId, data }));
+    // }
   
     const { offsetX, offsetY, target } = e.nativeEvent;
     const { clientWidth, clientHeight } = target;

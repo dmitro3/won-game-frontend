@@ -3,6 +3,7 @@ import { Typography, Button } from "@material-tailwind/react";
 import { useDispatch, useSelector } from 'react-redux';
 import Animate from "../components/Animate";
 import { getRanking } from '../actions/other';
+import { showLoading } from '../actions/other';
 
 const Leaderboard = () => {
 
@@ -13,6 +14,7 @@ const Leaderboard = () => {
 
     useEffect(() => {
         dispatch(getRanking());
+        dispatch(showLoading(true));
     }, [dispatch]);
 
     const sortedData = [...data].sort((a, b) => b[type] - a[type]);

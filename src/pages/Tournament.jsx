@@ -4,8 +4,7 @@ import Animate from "../components/Animate";
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { getMonsters, setFightMonster } from '../actions/other';
-import { showPayment } from '../actions/other';
-
+import { showPayment, showLoading } from '../actions/other';
 const Tournament = () => {
 
     const nav = useNavigate();
@@ -15,6 +14,7 @@ const Tournament = () => {
 
     useEffect(() => {
         dispatch(getMonsters());
+        dispatch(showLoading(true));
     }, []);
 
     const onFight = (monster) => {

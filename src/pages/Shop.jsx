@@ -7,7 +7,7 @@ import { buyItem } from '../actions/shop';
 import { viewAll } from '../actions/mine';
 import { unlockCharacter, viewCharacters } from '../actions/character';
 import { updateUser } from '../actions/earn';
-import { showPayment } from '../actions/other';
+import { showPayment, showLoading } from '../actions/other';
 
 const Shop = () => {
     const userData = useSelector((state) => state.earn.user);
@@ -18,6 +18,7 @@ const Shop = () => {
 
     useEffect(() => {
         dispatch(viewAll({telegramId, username}));
+        dispatch(showLoading(true));
     }, []);
 
     const handleItemClick = (item) => {

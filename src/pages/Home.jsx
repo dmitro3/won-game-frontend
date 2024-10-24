@@ -46,7 +46,7 @@ const Home = () => {
                         <Spinner color="amber" className="h-24 w-24"/>
                         <p className="mt-3 text-white text-[20px]">Loading...</p>
                     </div>
-                    {setTimeout(() => dispatch(showLoading(!showLoad)), 3000)}
+                    {setTimeout(() => dispatch(showLoading(!showLoad)), 2000)}
                 </div>
             }
 

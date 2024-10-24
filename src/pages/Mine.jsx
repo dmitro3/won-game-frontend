@@ -1,11 +1,11 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Animate from "../components/Animate";
 import MineItem from '../components/MineItem';
 import ViewDetails from '../components/ViewDetails';
-import { Button, ButtonGroup } from "@material-tailwind/react";
 import { useDispatch, useSelector } from 'react-redux';
 import { viewAll, viewItem } from '../actions/mine';
 import MineCharacter from '../components/MineCharacter';
+import { showLoading } from '../actions/other';
 
 const Mine = () => {
     const dispatch = useDispatch();
@@ -20,6 +20,7 @@ const Mine = () => {
 
     useEffect(() => {
         dispatch(viewAll({telegramId, username}));
+        dispatch(showLoading(true));
     }, []);
 
     useEffect(() => {
