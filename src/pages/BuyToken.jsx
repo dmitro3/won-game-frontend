@@ -12,8 +12,8 @@ import { isSafeValue } from '../utils';
 import showToast from '../utils/toast';
 
 // actions
-import { updateUser } from '../actions/earn';
-import { updateToken } from '../actions/earn';
+import { updateUser } from '../actions/user';
+import { updateToken } from '../actions/user';
 
 
 const BuyToken = ({onSubmit, onClose}) => {
@@ -25,7 +25,7 @@ const BuyToken = ({onSubmit, onClose}) => {
     ]
 
     const dispatch = useDispatch();
-    const earnData = useSelector((state) => state.earn);
+    const earnData = useSelector((state) => state.user);
     const telegramId = useSelector((state)=> state.other.telegramId);
     
     //telegram wallet

@@ -2,7 +2,7 @@ import Animate from "../components/Animate";
 import React, { useState, useEffect, useRef } from 'react';
 import { Progress, Button, Dialog } from "@material-tailwind/react";
 import { useDispatch, useSelector } from 'react-redux';
-import { viewUser, updateUser } from '../actions/earn';
+import { loadUser, updateUser } from '../actions/user';
 import { viewActivity, updateActivity } from '../actions/activity';
 import { getItem, viewAll } from '../actions/mine';
 import { useNavigate } from 'react-router-dom';
@@ -32,7 +32,7 @@ const Challenge = () => {
     const nav = useNavigate();
 
     const dispatch = useDispatch();
-    const userData = useSelector((state) => state.earn.user);
+    const userData = useSelector((state) => state.user.user);
     const mineData = useSelector((state) => state.mine.items);
     const activityData = useSelector((state)=> state.activity.activity);
     const selMonster = useSelector((state) => state.other.fightMonster);
@@ -51,9 +51,7 @@ const Challenge = () => {
     };
 
     useEffect(() => {
-        dispatch(viewUser({telegramId, username}));
         dispatch(getItem());
-        dispatch(viewAll({telegramId, username}));
         dispatch(viewActivity({telegramId, username}));
 
         return () => clearInterval(interval);

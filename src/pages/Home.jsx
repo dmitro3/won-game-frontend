@@ -4,9 +4,10 @@ import Footer from '../components/Footer';
 import { useDispatch, useSelector } from 'react-redux';
 import BuyToken from "./BuyToken";
 import { Spinner } from "@material-tailwind/react";
-import { showPayment, showLoading } from "../actions/other";
+import { showPayment } from "../actions/other";
 import { useEffect } from "react";
-import { viewUser } from "../actions/earn";
+import { loadUser } from "../actions/user";
+import { viewAll } from '../actions/mine';
 
 const Home = () => {
 
@@ -15,9 +16,11 @@ const Home = () => {
     const showLoad = useSelector((state) => state.other.showLoading);
     const telegramId = useSelector((state)=> state.other.telegramId);
     const username = useSelector((state)=> state.other.username);
+
     useEffect(() => {
-        dispatch(viewUser({telegramId, username}));
-    }, [showPay, showLoad]);
+        dispatch(loadUser({telegramId, username}));
+        dispatch(viewAll({telegramId, username}));
+    }, []);
 
     return (
         <div className="w-full h-full flex justify-center">
@@ -46,7 +49,6 @@ const Home = () => {
                         <Spinner color="amber" className="h-24 w-24"/>
                         <p className="mt-3 text-white text-[20px]">Loading...</p>
                     </div>
-                    {setTimeout(() => dispatch(showLoading(!showLoad)), 2000)}
                 </div>
             }
 

@@ -7,7 +7,6 @@ const initialState = {
 
 const mineReducer = (state = initialState, action) => {
 	const { type, payload } = action;
-
 	switch (type) {
 		case VIEW_ALL:
 			return {

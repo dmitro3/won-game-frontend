@@ -1,20 +1,19 @@
 import React, { useEffect } from 'react';
-import { Typography, Button } from "@material-tailwind/react";
+import { Typography } from "@material-tailwind/react";
 import Animate from "../components/Animate";
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { getMonsters, setFightMonster } from '../actions/other';
-import { showPayment, showLoading } from '../actions/other';
+import { showPayment } from '../actions/other';
 const Tournament = () => {
 
     const nav = useNavigate();
     const dispatch = useDispatch();
     const monsters = useSelector((state) => state.other.monster);
-    const userData = useSelector((state) => state.earn.user);
+    const userData = useSelector((state) => state.user.user);
 
     useEffect(() => {
         dispatch(getMonsters());
-        dispatch(showLoading(true));
     }, []);
 
     const onFight = (monster) => {

@@ -1,21 +1,20 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button } from "@material-tailwind/react";
-import { updateUser, viewUser } from '../actions/earn';
+import { updateUser, loadUser } from '../actions/user';
 import { viewActivity, updateActivity } from '../actions/activity';
 
 const Milestones = () => {
     const [coin, setCoin] = useState(0);
     const [level, setLevel] = useState(0);
     const [earned, setEarned] = useState(0);
-    const userData = useSelector((state) => state.earn.user);
+    const userData = useSelector((state) => state.user.user);
     const activityData = useSelector((state)=> state.activity.activity);
     const telegramId = useSelector((state)=> state.other.telegramId);
     const username = useSelector((state)=> state.other.username);
     const dispatch = useDispatch();
 
     useEffect(() => {
-        dispatch(viewUser({telegramId, username}));
         dispatch(viewActivity({telegramId, username}));
     },[]);
 

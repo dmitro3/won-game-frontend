@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Typography, Button } from "@material-tailwind/react";
+import { Typography } from "@material-tailwind/react";
 import { useDispatch, useSelector } from 'react-redux';
 import Animate from "../components/Animate";
 import { getRanking } from '../actions/other';
-import { showLoading } from '../actions/other';
 
 const Leaderboard = () => {
 
@@ -14,8 +13,7 @@ const Leaderboard = () => {
 
     useEffect(() => {
         dispatch(getRanking());
-        dispatch(showLoading(true));
-    }, [dispatch]);
+    }, []);
 
     const sortedData = [...data].sort((a, b) => b[type] - a[type]);
     const handleSelect = (selectedType) => {
@@ -36,7 +34,6 @@ const Leaderboard = () => {
                         <img src="/assets/img/taps.png" className='w-[90px] h-[30px] cursor-pointer' style={{border: type == "points" ? "1px solid" : "none"}} onClick={() => handleSelect('points')}/>
                         <img src="/assets/img/battles.png" className='w-[90px] h-[30px] cursor-pointer' style={{border: type == "pointsBalance" ? "1px solid" : "none"}} onClick={() => handleSelect('pointsBalance')}/>
                     </div>
-
                     {/* Display sorted data */}
                     {sortedData.map((user, idx) => (
                         user && (

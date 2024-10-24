@@ -11,7 +11,6 @@ import Splash from './pages/Splash';
 import Home from "./pages/Home";
 import Shop from "./pages/Shop";
 import Earn from "./pages/Earn";
-import Settings from "./pages/Settings";
 import Mine from "./pages/Mine";
 import Challenge from "./pages/Challenge";
 import Leaderboards from "./pages/Leaderboards";
@@ -59,10 +58,6 @@ const router = createBrowserRouter([
             {
                 path:"/home/shop",
                 element: <Shop />,
-            },
-            {
-                path:"/home/settings",
-                element: <Settings />,
             },
         ],
     }

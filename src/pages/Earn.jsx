@@ -3,14 +3,11 @@ import { Progress, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Typog
 import Milestones from "../components/Milestones";
 import styled, { keyframes } from "styled-components";
 import { useDispatch, useSelector } from 'react-redux';
-import { viewUser, updateUser, updateToken } from '../actions/earn';
-import { viewAll } from '../actions/mine';
+import { updateUser, updateToken } from '../actions/user';
 import { viewActivity, updateActivity } from '../actions/activity';
 import { showPayment, getChallenge, showLoading } from '../actions/other';
 import { useNavigate } from 'react-router-dom';
 import { isSafeValue } from '../utils';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 const slideUp = keyframes`
     0% {
@@ -52,13 +49,12 @@ const Earn = () => {
   const [mine, setMine] = useState(null);
   const imageRef = useRef(null);
   const dispatch = useDispatch();
-  const userData = useSelector((state) => state.earn.user);
+  const userData = useSelector((state) => state.user.user);
   const activityData = useSelector((state)=> state.activity.activity);
   const mineData = useSelector((state) => state.mine.items);
-  const levelData = useSelector((state)=> state.earn.level);
+  const levelData = useSelector((state)=> state.user.level);
   const telegramId = useSelector((state)=> state.other.telegramId);
   const username = useSelector((state)=> state.other.username);
-
   const [pendingUpdates, setPendingUpdates] = useState({}); // For debouncing the API call
   const pendingUpdatesRef = useRef({});
   const [pendingUpdates1, setPendingUpdates1] = useState({}); // For debouncing the API call
@@ -67,10 +63,7 @@ const Earn = () => {
   const nav = useNavigate();
   
   useEffect(() => {
-      dispatch(viewUser({telegramId, username}));
       dispatch(viewActivity({telegramId, username}));
-      dispatch(viewAll({telegramId, username}));
-      dispatch(showLoading(true));
   },[]);
 
   const isEmpty = (val) => {
@@ -143,10 +136,7 @@ const Earn = () => {
 
   const handleOpen = () => setOpen((cur) => !cur);
   const handleAlertOpen = () => setAlertOpen((cur) => !cur);
-  const handleRewardOpen = () => {
-    setRewardOpen((cur) => !cur);
-  }
-
+  const handleRewardOpen = () => setRewardOpen((cur) => !cur);
   useEffect(() => {
     // Sync the ref with the state
     pendingUpdatesRef.current = pendingUpdates;
@@ -167,7 +157,6 @@ const Earn = () => {
       }
       if (Object.keys(pendingUpdatesRef1.current).length > 0) {
         // Send the request with pending updates
-        console.log("here---", pendingUpdatesRef1.current)
         dispatch(updateUser({ telegramId, data: pendingUpdatesRef1.current }));
         setPendingUpdates1({}); // Clear pending updates after sending
       }
@@ -200,7 +189,6 @@ const Earn = () => {
       };
       setPendingUpdates1(newUpdates1);
     }
-    
   
     // if (currentEnergy < totalEnergy) {
     //   setCurrentEnergy((prev) => prev + tapSpeed);

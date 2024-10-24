@@ -3,7 +3,7 @@ import { Progress, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Typog
 import Milestones from "./Milestones";
 import styled, { keyframes } from "styled-components";
 import { useDispatch, useSelector } from 'react-redux';
-import { viewUser, updateUser } from '../actions/earn';
+import { loadUser, updateUser } from '../actions/user';
 import { viewActivity, updateActivity } from '../actions/activity';
 import { showPayment, getChallenge } from '../actions/other';
 import { useNavigate } from 'react-router-dom';
@@ -47,13 +47,13 @@ const TouchPan = () => {
   const [clicks, setClicks] = useState([]);
   const imageRef = useRef(null);
   const dispatch = useDispatch();
-  const userData = useSelector((state) => state.earn.user);
+  const userData = useSelector((state) => state.user.user);
   const activityData = useSelector((state)=> state.activity.activity);
-  const levelData = useSelector((state)=> state.earn.level);
+  const levelData = useSelector((state)=> state.user.level);
   const nav = useNavigate();
   
   useEffect(() => {
-      dispatch(viewUser());
+      dispatch(loadUser());
       dispatch(viewActivity());
   },[]);
   const isEmpty = (val) => {

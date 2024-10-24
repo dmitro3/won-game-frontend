@@ -5,7 +5,6 @@ import ViewDetails from '../components/ViewDetails';
 import { useDispatch, useSelector } from 'react-redux';
 import { viewAll, viewItem } from '../actions/mine';
 import MineCharacter from '../components/MineCharacter';
-import { showLoading } from '../actions/other';
 
 const Mine = () => {
     const dispatch = useDispatch();
@@ -17,11 +16,6 @@ const Mine = () => {
     const mineItems = useSelector((state) => state.mine.items);
     const telegramId = useSelector((state)=> state.other.telegramId);
     const username = useSelector((state)=> state.other.username);
-
-    useEffect(() => {
-        dispatch(viewAll({telegramId, username}));
-        dispatch(showLoading(true));
-    }, []);
 
     useEffect(() => {
         mineItems.forEach((item) => {
