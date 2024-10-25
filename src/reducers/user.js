@@ -1,4 +1,5 @@
 import { UPDATE_TOKEN, UPDATE_USER, VIEW_USER } from '../constants/userConstants';
+import { UPDATE_ACTIVITY_WITH_USER } from '../constants/activityConstants';
 
 const initialState = {
 	user: {},
@@ -25,6 +26,11 @@ const earnReducer = (state = initialState, action) => {
 			return {
 				...state,
 			};
+		case UPDATE_ACTIVITY_WITH_USER:
+			state.user['currentEnergy'] = payload.energy;
+			return {
+				...state,
+			}	
 		default:
 			return state;
 	}

@@ -3,9 +3,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Progress, Button, Dialog } from "@material-tailwind/react";
 import { useDispatch, useSelector } from 'react-redux';
 import { loadUser, updateUser } from '../actions/user';
-import { viewActivity, updateActivity } from '../actions/activity';
+import { viewActivity, updateActivityWithUser } from '../actions/activity';
+import { showPayment, getChallenge } from "../actions/other";
+import { isSafeValue } from '../utils';
 import { getItem, viewAll } from '../actions/mine';
 import { useNavigate } from 'react-router-dom';
+import { UPDATE_ACTIVITY_WITH_USER } from '../constants/activityConstants';
 
 let interval;
 let timeDuration = 50; // ms
@@ -38,10 +41,12 @@ const Challenge = () => {
     const selMonster = useSelector((state) => state.other.fightMonster);
     const telegramId = useSelector((state)=> state.other.telegramId);
     const username = useSelector((state)=> state.other.username);
+    const [counts, setCounts] = useState(0);
 
     const [pendingUpdates, setPendingUpdates] = useState({}); // For debouncing the API call
     const pendingUpdatesRef = useRef({});
-    
+    let lockUpdate = false;
+
     const shootManSpark = () => {
         setManSparks((prev) => [...prev, { id: Date.now(), position: 80 }]);
     };
@@ -52,8 +57,6 @@ const Challenge = () => {
 
     useEffect(() => {
         dispatch(getItem());
-        dispatch(viewActivity({telegramId, username}));
-
         return () => clearInterval(interval);
     }, []);
 
@@ -90,13 +93,6 @@ const Challenge = () => {
     }, [activityData]);
 
     useEffect(() => {
-        if (!isEmpty(userData)) {
-            setWins(userData.pointsBalance);
-            setEarned(userData.tokensEarned);
-        }
-    }, [userData]);
-
-    useEffect(() => {
         let equipped = mineData.filter((item) => item.isWear);
 
         let attack = 0, defence = 0, health = 0, avatar = "";
@@ -109,7 +105,7 @@ const Challenge = () => {
         if (health < userData.energyLimit) health = userData.energyLimit;
         if (attack <= 0) attack = 3;
         if (defence <= 0) defence = 1;
-
+        setCounts(userData.points);
         let user = {
             ...userData,
             curHealth: userData.currentEnergy,
@@ -134,7 +130,6 @@ const Challenge = () => {
     }, [selMonster]);
 
     useEffect(() => {
-        // Monster shoots a spark every 3 seconds
         monsterInterval = setInterval(() => {
             shootMonsterSpark();
         }, 800);
@@ -146,32 +141,27 @@ const Challenge = () => {
     }, []);
 
     useEffect(() => {
-        // Sync the ref with the state
         pendingUpdatesRef.current = pendingUpdates;
     }, [pendingUpdates]);
       
-    useEffect(() => {
-        // Set up the interval for sending requests every 2 seconds
-        const interval = setInterval(() => {
-          if (Object.keys(pendingUpdatesRef.current).length > 0) {
-            // Send the request with pending updates
-            dispatch(updateActivity({ telegramId, data_activity: pendingUpdatesRef.current }));
-            setPendingUpdates({}); // Clear pending updates after sending
-          }
-        }, 2000); // Set interval to 2 seconds
-      
-        // Clean up the interval on component unmount
-        return () => clearInterval(interval);
-    }, []); // Run once when the component mounts
-    
-
     const handleShoot = () => {
         if (tapLimit <= 0) return;
-        shootManSpark(); // Shoot a spark on each button click
+        shootManSpark();
         setTapLimit(prev => prev - 1);
+        dispatch({
+            type: UPDATE_ACTIVITY_WITH_USER,
+            payload: {
+              limit: tapLimit - 1,
+              energy: mine.curHealth,
+            }
+        });
+      
         const newUpdates = {
             ...pendingUpdatesRef.current,
             tapLimit: tapLimit - 1,
+            currentEnergy: mine.curHealth,
+            levelIndex: userData.levelIndex,
+            points: counts + 1,
         };
         setPendingUpdates(newUpdates);
     };
@@ -237,8 +227,16 @@ const Challenge = () => {
                     setMine(cur => {
                         let curHealth = cur.curHealth - monsterAttack * 3;
                         if (curHealth < 0) curHealth = 0;
-                        let data = { levelIndex: userData.levelIndex, currentEnergy: curHealth };
-                        dispatch(updateUser({ telegramId, data }));
+                        const newUpdate = {
+                            ...pendingUpdatesRef.current,
+                            tapLimit: tapLimit,
+                            currentEnergy: curHealth,
+                            levelIndex: userData.levelIndex,
+                            points: counts,
+                        };
+                        setPendingUpdates(newUpdate);
+                        // let data = { levelIndex: userData.levelIndex, currentEnergy: curHealth };
+                        // dispatch(updateUser({ telegramId, data }));
                         return {
                             ...cur,
                             curHealth,
@@ -254,6 +252,22 @@ const Challenge = () => {
         setAniInterval(aniInterval => aniInterval + 1);
         clearTimeout(interval);
     }
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+          if (Object.keys(pendingUpdatesRef.current).length > 0 && !lockUpdate) {
+            console.log("Update user", pendingUpdatesRef.current);
+            dispatch(updateActivityWithUser({
+              telegramId, 
+              data_activity: pendingUpdatesRef.current,
+            }, () => lockUpdate = false));
+            setPendingUpdates({});
+            lockUpdate = true;
+          }
+        }, 2000);
+    
+        return () => clearInterval(interval);
+    }, []);
 
     const handleAttack = () => {
         if(mine.attackItems <= 0) return;
@@ -345,22 +359,22 @@ const Challenge = () => {
 
                             <div className="flex flex-col justify-start border-[5px] border-red-500 py-4 px-2 rounded-lg bg-[#6CF47F66]">
                                 <img src="/assets/monster/monster1.png" alt='avatar' 
-                                    className="w-[120px] h-[160px] mx-auto"/>
+                                    className="w-[120px] h-[160px] mx-auto p-3"/>
                                 <div className="flex gap-2 items-center mt-5">
                                     <img src="/assets/img/heart.png" alt='avatar' className="w-[22px] h-[22px]"/>
-                                    <p className='text-white text-[24px] font-bold'>{monster && monster.curHealth}</p>
+                                    <p className='text-white text-[24px] font-bold'>{selMonster && selMonster.energyLimit}</p>
                                 </div>
                                 <div className="flex gap-2 items-center">
                                     <img src="/assets/challenge/attack.png" alt='avatar' className="w-[22px] h-[22px]"/>
-                                    <p className='text-white text-[24px] font-bold'>{monster && monster.attack}</p>
+                                    <p className='text-white text-[24px] font-bold'>{selMonster && selMonster.attack}</p>
                                 </div>
                                 <div className="flex gap-2 items-center">
                                     <img src="/assets/challenge/defence.png" alt='avatar' className="w-[22px] h-[22px]"/>
-                                    <p className='text-white text-[24px] font-bold'>{monster && monster.defence}</p>
+                                    <p className='text-white text-[24px] font-bold'>{selMonster && selMonster.defense}</p>
                                 </div>
                                 <div className="flex gap-2 items-center">
                                     <img src="/assets/img/loader.webp" alt='avatar' className="w-[22px] h-[22px]"/>
-                                    <p className='text-white text-[24px] font-bold'>{monster && monster.tokens}</p>
+                                    <p className='text-white text-[24px] font-bold'>{selMonster && selMonster.tokenEarns}</p>
                                 </div>
                             </div>
                         </div>

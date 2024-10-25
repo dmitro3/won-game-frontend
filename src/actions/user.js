@@ -11,13 +11,14 @@ export const loadUser = ({telegramId, username}) => async (dispatch, getState) =
   });
 };
 
-export const updateUser = ({telegramId, data}) => async (dispatch, getState) => {
+export const updateUser = ({telegramId, data}, callback) => async (dispatch, getState) => {
   let state = getState();
   const res = await api(`${serverUrl}/user/${telegramId}`, 'put', data, state.other.token);
   dispatch({
     type: UPDATE_USER,
     payload: res.data
   });
+  if (callback) callback();
 };
 
 export const updateToken = ({telegramId, tokenToAdd}) => async (dispatch, getState) => {

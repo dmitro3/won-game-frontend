@@ -4,10 +4,12 @@ import Footer from '../components/Footer';
 import { useDispatch, useSelector } from 'react-redux';
 import BuyToken from "./BuyToken";
 import { Spinner } from "@material-tailwind/react";
-import { showPayment } from "../actions/other";
+import { showPayment, getChallenge } from "../actions/other";
+import { isSafeValue, isEmpty } from '../utils';
 import { useEffect } from "react";
 import { loadUser } from "../actions/user";
 import { viewAll } from '../actions/mine';
+import { viewActivity } from '../actions/activity';
 
 const Home = () => {
 
@@ -16,11 +18,18 @@ const Home = () => {
     const showLoad = useSelector((state) => state.other.showLoading);
     const telegramId = useSelector((state)=> state.other.telegramId);
     const username = useSelector((state)=> state.other.username);
-
+    const userData = useSelector((state) => state.user.user);
     useEffect(() => {
         dispatch(loadUser({telegramId, username}));
+        dispatch(viewActivity({telegramId, username}));
         dispatch(viewAll({telegramId, username}));
     }, []);
+
+    useEffect(() => {
+        console.log("last", userData.lastChallenge)
+        if (userData.lastChallenge == undefined) return;
+        dispatch(getChallenge(isSafeValue(userData.lastChallenge, 1)));
+    }, [userData.lastChallenge]);
 
     return (
         <div className="w-full h-full flex justify-center">

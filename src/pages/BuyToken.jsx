@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Typography, useMenu } from "@material-tailwind/react";
+import { Typography, Spinner } from "@material-tailwind/react";
 import { useTonAddress, useTonConnectModal, useTonConnectUI } from "@tonconnect/ui-react";
 import BigNumber from "bignumber.js";
 
@@ -36,7 +36,7 @@ const BuyToken = ({onSubmit, onClose}) => {
     const [needShow, setNeedShow] = useState(false);
     const [token, setToken] = useState(0);
     const [coin, setCoin] = useState(0);
-
+    const [loadingState, setLoadingState] = useState([false, false, false]);
     const [attack2, setAttack2] = useState(0);
     const [defence2, setDefence2] = useState(0);
     const [life2, setLife2] = useState(0);
@@ -44,9 +44,6 @@ const BuyToken = ({onSubmit, onClose}) => {
     const userData = useMemo(() => {
         return earnData.user
     }, [earnData]);
-
-    useEffect(() => {
-    }, [userData])
 
     const handleWallet = useCallback(async () => {
         if (isNaN(coin) || coin <= 0) {
@@ -103,10 +100,10 @@ const BuyToken = ({onSubmit, onClose}) => {
     }
 
     const claimItems = (type) => {
+        
         if (type == 0 && attack2 == 0) return;
         if (type == 1 && defence2 == 0) return;
         if (type == 2 && life2 == 0) return;
-        // dispatch(showLoading(true));
         let amount = 0;
         let tokensNeeded = 0;
         let key = '';
@@ -119,13 +116,27 @@ const BuyToken = ({onSubmit, onClose}) => {
 
         if (isSafeValue(userData.tokens, 1) >= tokensNeeded) {
             setNeedShow(false);
+            if (loadingState[type]) return;
+            setLoadingState(state => {
+                let updated = [...state];
+                updated[type] = true;
+                return updated;
+            });
+
             let data = { tokens: userData.tokens - tokensNeeded, levelIndex: userData.levelIndex, [key]: isSafeValue(userData[key]) + amount };
-            dispatch(updateUser({ telegramId, data }));
+            dispatch(updateUser({ telegramId, data }, () => {
+                setLoadingState(state => {
+                    let updated = [...state];
+                    updated[type] = false;
+                    return updated;
+                });
+                showToast("success", "Buy successfully!");
+            }));
 
             if (type == 0)      setAttack2(0);
             else if (type == 1) setDefence2(0);
             else if (type == 2) setLife2(0);
-            showToast("success", "Buy successfully!");
+            
         } else {
             setNeedShow(true);
         }
@@ -211,7 +222,9 @@ const BuyToken = ({onSubmit, onClose}) => {
                                     <div>{item.tokenNeeded * itemVal}</div>
                                 </div>
                                 <button className="bg-[#FFC658] hover:bg-[#FFC658EE] text-[#C94A0C] font-bold py-1 px-2 border-b-[3px] border-r-[3px] border-[#c18f2d] shadow rounded" onClick={() => claimItems(idx)}>
-                                    Claim
+                                    <div className="flex justify-center w-[45px]">
+                                        {loadingState[idx] ? <Spinner /> : "Claim"}
+                                    </div>
                                 </button>
                             </div>
                         );

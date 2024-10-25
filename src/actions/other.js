@@ -26,6 +26,7 @@ export const getMonsters = () => async (dispatch, getState) => {
 export const getChallenge = (idx) => async (dispatch, getState) => {
   let state = getState();
   const res = await api(`${serverUrl}/etc/challenge/${idx}`, 'get', null, state.other.token);
+  console.log("getchallenge", res);
   dispatch({
     type: SET_TARGET_MONSTER,
     payload: res.data.data,

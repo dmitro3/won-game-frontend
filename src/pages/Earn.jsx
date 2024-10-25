@@ -1,13 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Progress, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Typography } from "@material-tailwind/react";
+import { Progress, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Typography, Spinner } from "@material-tailwind/react";
 import Milestones from "../components/Milestones";
 import styled, { keyframes } from "styled-components";
 import { useDispatch, useSelector } from 'react-redux';
-import { updateUser } from '../actions/user';
+import { updateUser, loadUser } from '../actions/user';
 import { viewActivity, updateActivity, updateActivityWithUser } from '../actions/activity';
 import { showPayment, getChallenge } from '../actions/other';
 import { useNavigate } from 'react-router-dom';
 import { isSafeValue } from '../utils';
+import { UPDATE_ACTIVITY_WITH_USER } from '../constants/activityConstants';
 
 const slideUp = keyframes`
     0% {
@@ -47,6 +48,7 @@ const Earn = () => {
   const [counts, setCounts] = useState(0);
   const [clicks, setClicks] = useState([]);
   const [mine, setMine] = useState(null);
+  const [isUsingHP, setIsUsingHP] = useState(false);
   const imageRef = useRef(null);
   const dispatch = useDispatch();
   const userData = useSelector((state) => state.user.user);
@@ -61,10 +63,6 @@ const Earn = () => {
   let lockUpdate = false;
 
   const nav = useNavigate();
-  
-  useEffect(() => {
-      dispatch(viewActivity({telegramId, username}));
-  },[]);
 
   const isEmpty = (val) => {
     if (!val) return true;
@@ -146,7 +144,8 @@ const Earn = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       if (Object.keys(pendingUpdatesRef.current).length > 0 && !lockUpdate) {
-        dispatch(updateActivityWithUser({ 
+        console.log("Update user", pendingUpdatesRef.current);
+        dispatch(updateActivityWithUser({
           telegramId, 
           data_activity: pendingUpdatesRef.current,
         }, () => lockUpdate = false));
@@ -168,6 +167,14 @@ const Earn = () => {
     setTapped((prev) => prev + tapSpeed);
     setTapLimit((prev) => prev - tapSpeed);
     setCurrentEnergy(()=> updatedEnergy);
+
+    dispatch({
+      type: UPDATE_ACTIVITY_WITH_USER,
+      payload: {
+        limit: tapLimit - tapSpeed,
+        energy: updatedEnergy,
+      }
+    });
 
     const newUpdates = {
       ...pendingUpdatesRef.current,
@@ -221,13 +228,26 @@ const Earn = () => {
   const onFight = () => {
     if(currentEnergy == 0) handleAlertOpen();
     else {
-      dispatch(getChallenge(isSafeValue(userData.lastChallenge, 1)));
+      if (Object.keys(pendingUpdatesRef.current).length > 0) {
+        dispatch(updateActivityWithUser({ 
+          telegramId, 
+          data_activity: pendingUpdatesRef.current,
+        }));
+      }
+      console.log("lastChallenge", userData.lastChallenge)
+      
       nav('/home/challenge');
     }
   }
 
   const onTournament = () => {
     if(currentEnergy == 0) handleAlertOpen();
+    if (Object.keys(pendingUpdatesRef.current).length > 0) {
+      dispatch(updateActivityWithUser({ 
+        telegramId, 
+        data_activity: pendingUpdatesRef.current,
+      }));
+    }
     else nav('/home/tournament');
   }
 
@@ -237,10 +257,13 @@ const Earn = () => {
 
   const handleEnergy = () => {
     if (userData.lifeItems <= 0) return;
+    if (isUsingHP) return;
+
+    setIsUsingHP(true);
     let curHealth = (currentEnergy + 100 > totalEnergy) ? totalEnergy : currentEnergy + 100;
     let lifeItems = userData.lifeItems - 1;
     let data = { levelIndex: userData.levelIndex, currentEnergy: curHealth, lifeItems: lifeItems };
-    dispatch(updateUser({ telegramId, data }));
+    dispatch(updateUser({ telegramId, data }, () => setIsUsingHP(false)));
   }
 
   return (
@@ -380,10 +403,14 @@ const Earn = () => {
           </div>
           <div className='flex w-full px-1 justify-between'>
             <img src="/assets/img/reward.png" alt='Default User' className='w-[60px] h-[72px] cursor-pointer mt-[-110px]' onClick={handleRewardOpen}/>
-            <div className="flex flex-col border bg-[#b0f3b688] rounded-lg relative cursor-pointer mt-[-120px] h-fit px-1 hover:bg-[#5bb96388] border-b-2 shadow" onClick={handleEnergy} style={{visibility: mine && mine.lifeItems == 0 ? "hidden" : "visible"}}>
+            <div className="flex flex-col border bg-[#b0f3b688] rounded-lg relative cursor-pointer mt-[-120px] h-fit px-1 hover:bg-[#5bb96388] border-b-2 shadow" 
+              onClick={handleEnergy} 
+              style={{visibility: mine && mine.lifeItems == 0 ? "hidden" : "visible"}}>
               <img src="/assets/img/heart.png" alt='weapon' className="w-[40px] h-[40px] p-[4px]"/>
-              <p className='text-deep-orange-900 font-bold text-[14px]'>(+100)</p>
-              <p className='text-deep-orange-900 font-extrabold text-[16px] border-t-2'>{mine && mine.lifeItems}</p>
+              <p className='text-deep-orange-900 font-bold text-[14px] border-b-2'>(+100)</p>
+              <p className='text-deep-orange-900 font-extrabold text-[16px] flex mx-auto'>
+                {isUsingHP ? <Spinner /> : mine && mine.lifeItems}
+              </p>
             </div>
             
             {/* <img src="/assets/img/levelup.png" alt='Default User' className='w-[60px] h-[72px] cursor-pointer mt-[-100px]' onClick={handleOpen}/> */}
