@@ -18,7 +18,7 @@ const CoinIndicator = ({icon, value, size, busy, className = 'justify-center', i
     return (
         <div className={className + ' flex items-center gap-2'}>
             <img src={icon} alt='coin' width={`${width + iconDelta}px`} height={`${width + iconDelta}px`} />
-            <p style={{fontSize: width}} className={`text-[24px] font-bold`}>{busy ? <Spinner /> : value}</p>
+            <p style={{fontSize: width}} className={`text-[24px] font-bold`}>{busy ? <Spinner className="mb-3" /> : value}</p>
         </div>
     );
 };

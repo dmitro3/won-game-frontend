@@ -2,20 +2,18 @@ import Animate from "../components/Animate";
 import React, { useState, useEffect, useRef } from 'react';
 import { Progress, Button, Dialog } from "@material-tailwind/react";
 import { useDispatch, useSelector } from 'react-redux';
-import { loadUser, updateUser } from '../actions/user';
-import { viewActivity, updateActivityWithUser } from '../actions/activity';
-import { showPayment, getChallenge } from "../actions/other";
-import { isSafeValue } from '../utils';
-import { getItem, viewAll } from '../actions/mine';
+import { updateUser } from '../actions/user';
+import { updateActivityWithUser } from '../actions/activity';
+import { getItem } from '../actions/mine';
 import { useNavigate } from 'react-router-dom';
 import { UPDATE_ACTIVITY_WITH_USER } from '../constants/activityConstants';
 import TapButton from "../components/TapButton";
 import UserInfo from "../components/UserInfo";
 
-let interval;
-let timeDuration = 50; // ms
-let monsterInterval;
 let timerInterval;
+let sparkInterval;
+let updateInterval;
+let intervalCount = 0;
 
 const Challenge = () => {
     const [tapLimit, setTapLimit] = useState(0);
@@ -25,12 +23,10 @@ const Challenge = () => {
     const [wins, setWins] = useState(0);
     const [earned, setEarned] = useState(0);
     const [battleTime, setBattleTime] = useState(0);
-    const [aniInterval, setAniInterval] = useState(-1);
     const [manSparks, setManSparks] = useState([]);
     const [monsterSparks, setMonsterSparks] = useState([]);
 
     const [dlgShow, setDlgShow] = useState(true);
-    const [backShow, setBackShow] = useState(false);
     const [isWin, setIsWin] = useState(0);
     const [plusAttr, setPlusAttr] = useState([0,0,0]);
     const boost = [ 40, 30, 100 ];
@@ -42,7 +38,6 @@ const Challenge = () => {
     const activityData = useSelector((state)=> state.activity.activity);
     const selMonster = useSelector((state) => state.other.fightMonster);
     const telegramId = useSelector((state)=> state.other.telegramId);
-    const username = useSelector((state)=> state.other.username);
     const [counts, setCounts] = useState(0);
 
     const [pendingUpdates, setPendingUpdates] = useState({}); // For debouncing the API call
@@ -56,37 +51,6 @@ const Challenge = () => {
     const shootMonsterSpark = () => {
         setMonsterSparks((prev) => [...prev, { id: Date.now(), position: 290 }]);
     };
-
-    useEffect(() => {
-        dispatch(getItem());
-        return () => clearInterval(interval);
-    }, []);
-
-    const isEmpty = (val) => {
-        if (!val) return true;
-        if (Object.keys(val).length > 0) return false;
-        if (val.length > 0) return false;
-    
-        return true;
-    }
-
-    const handleOpen = () => {
-        setOpen((cur) => !cur);
-    }
-
-    const handleWinner = () => {
-        let data = { currentEnergy: mine.curHealth, tokens: mine.tokens + monster.tokenEarns, lastChallenge: monster.challengeIndex + 1, levelIndex: userData.levelIndex, pointsBalance: wins + 1, tokensEarned: earned + monster.tokenEarns };
-        dispatch(updateUser({ telegramId, data }));
-        setOpen((cur) => !cur);
-        nav('/home');
-    }
-
-    const handleLoser = () => {
-        let data = { currentEnergy: mine.curHealth, tokens: mine.tokens - monster.tokens, lastChallenge: monster.challengeIndex, levelIndex: userData.levelIndex };
-        dispatch(updateUser({ telegramId, data }));
-        setOpen((cur) => !cur);
-        nav('/home');
-    }
 
     useEffect(() => {
         if (!isEmpty(activityData)) {
@@ -108,6 +72,7 @@ const Challenge = () => {
         if (attack <= 0) attack = 3;
         if (defence <= 0) defence = 1;
         setCounts(userData.points);
+        
         let user = {
             ...userData,
             curHealth: userData.currentEnergy,
@@ -119,6 +84,8 @@ const Challenge = () => {
     
     useEffect(() => {
         if (!selMonster) return;
+
+        console.log("Set monster", dlgShow);
 
         let mon = {
             ...selMonster,
@@ -132,24 +99,68 @@ const Challenge = () => {
     }, [selMonster]);
 
     useEffect(() => {
-        monsterInterval = setInterval(() => {
-            shootMonsterSpark();
-        }, 800);
-    
+        pendingUpdatesRef.current = pendingUpdates;
+        console.log("Ref update", pendingUpdatesRef.current);
+    }, [pendingUpdates]);
+
+    useEffect(() => {
+        updateInterval = setInterval(() => updateUserInfoToDB(), 3000);
+
         return () => {
-            clearInterval(monsterInterval);
             clearInterval(timerInterval);
-        };
+            clearInterval(sparkInterval);
+            clearInterval(updateInterval);
+            updateUserInfoToDB();
+        }
     }, []);
 
     useEffect(() => {
-        pendingUpdatesRef.current = pendingUpdates;
-    }, [pendingUpdates]);
-      
+        if ((monster && monster.curHealth <= 0) || (mine && mine.curHealth <= 0)) {
+            clearInterval(timerInterval);
+            clearInterval(sparkInterval);
+
+            if (mine.curHealth > 0) setIsWin(1);
+            else                    setIsWin(2);
+
+            setOpen(() => true);
+        }
+    }, [monster && monster.curHealth, mine && mine.curHealth])
+
+    const updateUserInfoToDB = () => {
+        if (Object.keys(pendingUpdatesRef.current).length > 0 && !lockUpdate) {
+            console.log("Update user", pendingUpdatesRef.current);
+            dispatch(updateActivityWithUser({
+                telegramId, 
+                data_activity: pendingUpdatesRef.current,
+            }, () => lockUpdate = false));
+            setPendingUpdates({});
+            lockUpdate = true;
+        }
+    }
+
+    const startFighting = () => {
+        if (!monster) return;
+
+        setDlgShow(false);
+        setBattleTime(() => 0);
+        timerInterval = setInterval(() => setBattleTime((prev) => prev + 1), 1000);
+        sparkInterval = setInterval(() => {
+            manageSparks();
+            intervalCount++;
+            if (intervalCount >= 10) {
+                shootMonsterSpark();
+                intervalCount = 0;
+            }
+        }, 50);
+    }
+   
     const handleShoot = () => {
         if (tapLimit <= 0) return;
         shootManSpark();
         setTapLimit(prev => prev - 1);
+
+        console.log("Tap Limit", tapLimit);
+
         dispatch({
             type: UPDATE_ACTIVITY_WITH_USER,
             payload: {
@@ -165,43 +176,14 @@ const Challenge = () => {
             levelIndex: userData.levelIndex,
             points: counts + 1,
         };
+
         setPendingUpdates(newUpdates);
     };
 
-    useEffect(() => {
-        if(mine && monster && (mine.curHealth <= 0 || monster.curHealth <= 0)) {
-
-            if (mine.curHealth > 0) setIsWin(1);
-            else                    setIsWin(2);
-            clearTimeout(interval);
-            clearInterval(monsterInterval);
-            clearInterval(timerInterval);
-            handleOpen();
-            setBackShow(() => true);
-        } else if (!dlgShow) {
-            interval = setTimeout(() => doFightAction(), timeDuration);
-        }
-    }, [aniInterval]);
-
-    const startFighting = () => {
-        setDlgShow(false);
-        setBackShow(false);
-        setBattleTime(() => 0);
-        setAniInterval(() => 1);
-        
-        timerInterval = setInterval(() => setBattleTime((prev) => prev + 1), 1000);
-    }
-
-    const doFightAction = () => {
-        setManSparks((prevSparks) =>
-            prevSparks.map((spark) => ({ ...spark, position: spark.position + 20 }))
-        );
-        setMonsterSparks((prevSparks) =>
-            prevSparks.map((spark) => ({ ...spark, position: spark.position - 20 }))
-        );
-    
-        setManSparks((prevSparks) => {
-            return prevSparks.filter((spark) => {
+    const manageSparks = () => {
+        setManSparks((prev) => {
+            let update = [];
+            prev.forEach((spark) => {
                 if (spark.position >= 290) {
                     let rand = Math.random();
                     let manAttack = Math.floor((mine.attack + plusAttr[0]) * 0.85 - monster.defence * (1 + rand));
@@ -214,18 +196,23 @@ const Challenge = () => {
                             curHealth,
                         }
                     });
-                    return false;
+                } else {
+                    spark.position += 10;
+                    update.push(spark);
                 }
-                return true; 
             });
+
+            return update;
         });
-    
-        setMonsterSparks((prevSparks) => {
-            return prevSparks.filter((spark) => {
+
+        setMonsterSparks((prev) => {
+            let update = [];
+            prev.forEach((spark) => {
                 if (spark.position <= 30) {
                     let rand = Math.random();
                     let monsterAttack = Math.floor(monster.attack + (1 + rand) - (mine.defence + plusAttr[1]) * 0.8);
                     if (monsterAttack < 0) monsterAttack = 1;
+
                     setMine(cur => {
                         let curHealth = cur.curHealth - monsterAttack * 3;
                         if (curHealth < 0) curHealth = 0;
@@ -236,40 +223,72 @@ const Challenge = () => {
                             levelIndex: userData.levelIndex,
                             points: counts,
                         };
+
                         setPendingUpdates(newUpdate);
-                        // let data = { levelIndex: userData.levelIndex, currentEnergy: curHealth };
-                        // dispatch(updateUser({ telegramId, data }));
+                        dispatch({
+                            type: UPDATE_ACTIVITY_WITH_USER,
+                            payload: {
+                              limit: tapLimit,
+                              energy: curHealth,
+                            }
+                        });
+
                         return {
                             ...cur,
                             curHealth,
                         }
                     });
-
-                    return false;
+                } else {
+                    spark.position -= 10;
+                    update.push(spark);
                 }
-                return true;
             });
+
+            return update;
         });
 
-        setAniInterval(aniInterval => aniInterval + 1);
-        clearTimeout(interval);
     }
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-          if (Object.keys(pendingUpdatesRef.current).length > 0 && !lockUpdate) {
-            console.log("Update user", pendingUpdatesRef.current);
-            dispatch(updateActivityWithUser({
-              telegramId, 
-              data_activity: pendingUpdatesRef.current,
-            }, () => lockUpdate = false));
-            setPendingUpdates({});
-            lockUpdate = true;
-          }
-        }, 2000);
+    const isEmpty = (val) => {
+        if (!val) return true;
+        if (Object.keys(val).length > 0) return false;
+        if (val.length > 0) return false;
     
-        return () => clearInterval(interval);
-    }, []);
+        return true;
+    }
+
+    const handleWinner = () => {
+        let data = { 
+            currentEnergy: mine.curHealth, 
+            tokens: mine.tokens + monster.tokenEarns, 
+            lastChallenge: monster.challengeIndex + 1, 
+            levelIndex: userData.levelIndex, 
+            pointsBalance: wins + 1, 
+            tokensEarned: earned + monster.tokenEarns,
+        };
+
+        setOpen(() => false);
+        dispatch(updateUser({ telegramId, data }));
+        setDlgShow(() => true);
+        setMonster(() => null);
+    }
+
+    const handleLoser = () => {
+        let data = { 
+            currentEnergy: mine.curHealth, 
+            tokens: mine.tokens - monster.tokens, 
+            lastChallenge: monster.challengeIndex, 
+            levelIndex: userData.levelIndex,
+        };
+
+        dispatch(updateUser({ telegramId, data }));
+        setOpen((cur) => !cur);
+        nav('/home');
+    }
+
+    const doCancel = () => {
+        nav('/home');
+    }
 
     const handleAttack = () => {
         if(mine.attackItems <= 0) return;
@@ -341,18 +360,18 @@ const Challenge = () => {
 
                             <UserInfo color="red" user={mine} />
                             <UserInfo color='blue' user={{
-                                ...selMonster,
+                                ...monster,
                                 avatar: '/assets/monster/monster1.png',
-                                curHealth: selMonster && selMonster.energyLimit,
-                                defence: selMonster && selMonster.defense,
-                                tokens: selMonster && selMonster.tokenEarns,
+                                curHealth: monster && monster.energyLimit,
+                                defence: monster && monster.defense,
+                                tokens: monster && monster.tokenEarns,
                             }} />
 
                         </div>
 
                         <div className="flex justify-between p-4 mt-10">
-                            <TapButton text="Fight" onClick={startFighting} size="lg" />
-                            <TapButton text="Cancel" onClick={() => nav("/home")} size="lg" />
+                            <TapButton text="Fight" onClick={() => startFighting()} size="lg" />
+                            <TapButton text="Cancel" onClick={() => doCancel()} size="lg" />
                         </div>
 
                     </div>
@@ -457,17 +476,17 @@ const Challenge = () => {
                        {isWin == 1?
                         <div className="flex flex-col justify-center">
                             <img src="/assets/challenge/winner.png" alt='winner' className="w-[120px] h-[180px] mx-auto mt-5"/>
-                            <Button onClick={handleWinner} className='py-5 px-8 text-[14px] w-[50%] mx-auto mt-5 mb-5'>
+                            <Button onClick={() => handleWinner()} className='py-5 px-8 text-[14px] w-[50%] mx-auto mt-5 mb-5'>
                                 <div className="flex gap-2 justify-center items-center">
                                     <img src="/assets/img/loader.webp" alt='coin' className="w-[24px] h-[24px]"/>
-                                    <p className="text-[18px]">{monster.tokens}</p>
+                                    <p className="text-[18px]">{monster && monster.tokens}</p>
                                 </div>
                             </Button>
                         </div>
                        :
                        <div className="flex flex-col justify-center">
                             <img src="/assets/challenge/loser.png" alt='winner' className="w-[120px] h-[180px] mx-auto mt-5"/>
-                            <Button onClick={handleLoser} className='py-5 px-8 text-[14px] w-[50%] mx-auto mt-5 mb-5'>Back Home</Button>
+                            <Button onClick={() => handleLoser()} className='py-5 px-8 text-[14px] w-[50%] mx-auto mt-5 mb-5'>Back Home</Button>
                         </div>
                        }
                     </Dialog>
@@ -529,10 +548,6 @@ const Challenge = () => {
                         
                     </div>
                 </div>
-
-                { backShow &&
-                    <div className="h-full w-full absolute left-[0px] top-[0px]" onClick={() => nav('/home')}></div>
-                }
             </div>
         </Animate>
     );
