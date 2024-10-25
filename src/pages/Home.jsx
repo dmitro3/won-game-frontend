@@ -19,6 +19,7 @@ const Home = () => {
     const telegramId = useSelector((state)=> state.other.telegramId);
     const username = useSelector((state)=> state.other.username);
     const userData = useSelector((state) => state.user.user);
+    
     useEffect(() => {
         dispatch(loadUser({telegramId, username}));
         dispatch(viewActivity({telegramId, username}));
