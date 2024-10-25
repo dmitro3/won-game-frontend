@@ -3,9 +3,9 @@ import { Progress, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Typog
 import Milestones from "../components/Milestones";
 import styled, { keyframes } from "styled-components";
 import { useDispatch, useSelector } from 'react-redux';
-import { updateUser, updateToken } from '../actions/user';
-import { viewActivity, updateActivity } from '../actions/activity';
-import { showPayment, getChallenge, showLoading } from '../actions/other';
+import { updateUser } from '../actions/user';
+import { viewActivity, updateActivity, updateActivityWithUser } from '../actions/activity';
+import { showPayment, getChallenge } from '../actions/other';
 import { useNavigate } from 'react-router-dom';
 import { isSafeValue } from '../utils';
 
@@ -57,8 +57,8 @@ const Earn = () => {
   const username = useSelector((state)=> state.other.username);
   const [pendingUpdates, setPendingUpdates] = useState({}); // For debouncing the API call
   const pendingUpdatesRef = useRef({});
-  const [pendingUpdates1, setPendingUpdates1] = useState({}); // For debouncing the API call
-  const pendingUpdatesRef1 = useRef({});
+
+  let lockUpdate = false;
 
   const nav = useNavigate();
   
@@ -137,65 +137,47 @@ const Earn = () => {
   const handleOpen = () => setOpen((cur) => !cur);
   const handleAlertOpen = () => setAlertOpen((cur) => !cur);
   const handleRewardOpen = () => setRewardOpen((cur) => !cur);
+
+
   useEffect(() => {
-    // Sync the ref with the state
     pendingUpdatesRef.current = pendingUpdates;
   }, [pendingUpdates]);
 
   useEffect(() => {
-    // Sync the ref with the state
-    pendingUpdatesRef1.current = pendingUpdates1;
-  }, [pendingUpdates1]);
-  
-  useEffect(() => {
-    // Set up the interval for sending requests every 2 seconds
     const interval = setInterval(() => {
-      if (Object.keys(pendingUpdatesRef.current).length > 0) {
-        // Send the request with pending updates
-        dispatch(updateActivity({ telegramId, data_activity: pendingUpdatesRef.current }));
-        setPendingUpdates({}); // Clear pending updates after sending
+      if (Object.keys(pendingUpdatesRef.current).length > 0 && !lockUpdate) {
+        dispatch(updateActivityWithUser({ 
+          telegramId, 
+          data_activity: pendingUpdatesRef.current,
+        }, () => lockUpdate = false));
+        setPendingUpdates({});
+        lockUpdate = true;
       }
-      if (Object.keys(pendingUpdatesRef1.current).length > 0) {
-        // Send the request with pending updates
-        dispatch(updateUser({ telegramId, data: pendingUpdatesRef1.current }));
-        setPendingUpdates1({}); // Clear pending updates after sending
-      }
-    }, 2000); // Set interval to 2 seconds
+    }, 2000);
 
-    // Clean up the interval on component unmount
     return () => clearInterval(interval);
-  }, []); // Run once when the component mounts
+  }, []);
   
   const handleClick = (e) => {
     if (tapLimit <= 0) return;
+
+    let updatedEnergy = currentEnergy + tapSpeed;
+    if (updatedEnergy > totalEnergy) updatedEnergy = totalEnergy;
   
     setCounts((prev) => prev + tapSpeed);
     setTapped((prev) => prev + tapSpeed);
     setTapLimit((prev) => prev - tapSpeed);
-    setCurrentEnergy((prev)=> prev + tapSpeed);
-    // Update pending updates (use ref for the current value)
+    setCurrentEnergy(()=> updatedEnergy);
+
     const newUpdates = {
       ...pendingUpdatesRef.current,
       tapLimit: tapLimit - tapSpeed,
+      currentEnergy: updatedEnergy,
+      levelIndex: level,
+      points: counts + tapSpeed,
     };
     setPendingUpdates(newUpdates);
 
-    if(currentEnergy < totalEnergy) {
-      const newUpdates1 = {
-        ...pendingUpdatesRef1.current,
-        currentEnergy: currentEnergy + tapSpeed, 
-        levelIndex: level, 
-        points: counts + tapSpeed
-      };
-      setPendingUpdates1(newUpdates1);
-    }
-  
-    // if (currentEnergy < totalEnergy) {
-    //   setCurrentEnergy((prev) => prev + tapSpeed);
-    //   let data = { currentEnergy: currentEnergy + tapSpeed, levelIndex: level, points: counts + tapSpeed };
-    //   dispatch(updateUser({ telegramId, data }));
-    // }
-  
     const { offsetX, offsetY, target } = e.nativeEvent;
     const { clientWidth, clientHeight } = target;
   
@@ -225,16 +207,15 @@ const Earn = () => {
   
     const rect = e.target.getBoundingClientRect();
     const newClick = {
-      id: Date.now(), // Unique identifier
+      id: Date.now(),
       x: e.clientX - rect.left,
       y: e.clientY - rect.bottom / 4 * 3,
     };
     setClicks((prevClicks) => [...prevClicks, newClick]);
   
-    // Remove the click after the animation duration
     setTimeout(() => {
       setClicks((prevClicks) => prevClicks.filter((click) => click.id !== newClick.id));
-    }, 1000); // Match this duration with the animation duration
+    }, 1000);
   };
 
   const onFight = () => {

@@ -18,5 +18,10 @@ export const updateActivity = ({telegramId, data_activity}) => async (dispatch, 
     type: UPDATE_ACTIVITY,
     payload: res.data
   });
- 
+};
+
+export const updateActivityWithUser = ({telegramId, data_activity}, callback) => async (dispatch, getState) => {
+  let state = getState();
+  const res = await api(`${serverUrl}/user/withActivity/${telegramId}`, 'put', data_activity, state.other.token);
+  if (callback) callback(res);
 };
