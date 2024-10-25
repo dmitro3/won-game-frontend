@@ -3,15 +3,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Typography, Spinner } from "@material-tailwind/react";
 import { useTonAddress, useTonConnectModal, useTonConnectUI } from "@tonconnect/ui-react";
 import BigNumber from "bignumber.js";
-
-// components
 import Animate from "../components/Animate";
-
-// utils
 import { isSafeValue } from '../utils';
 import showToast from '../utils/toast';
-
-// actions
 import { updateUser } from '../actions/user';
 import { updateToken } from '../actions/user';
 import TapButton from '../components/TapButton';

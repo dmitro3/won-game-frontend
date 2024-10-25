@@ -6,9 +6,10 @@ import { updateUser } from '../actions/user';
 import { updateActivityWithUser } from '../actions/activity';
 import { getItem } from '../actions/mine';
 import { useNavigate } from 'react-router-dom';
-import { UPDATE_ACTIVITY_WITH_USER } from '../constants/activityConstants';
+import { UPDATE_ACTIVITY_WITH_USER, UPDATE_USER_WITH_LIFE, UPDATE_USER_WITH_ATTACK, UPDATE_USER_WITH_DEFENCE } from '../constants/activityConstants';
 import TapButton from "../components/TapButton";
 import UserInfo from "../components/UserInfo";
+import BoostTouch from '../components/BoostTouch';
 
 let timerInterval;
 let sparkInterval;
@@ -85,8 +86,6 @@ const Challenge = () => {
     useEffect(() => {
         if (!selMonster) return;
 
-        console.log("Set monster", dlgShow);
-
         let mon = {
             ...selMonster,
             curHealth: selMonster.energyLimit,
@@ -100,7 +99,6 @@ const Challenge = () => {
 
     useEffect(() => {
         pendingUpdatesRef.current = pendingUpdates;
-        console.log("Ref update", pendingUpdatesRef.current);
     }, [pendingUpdates]);
 
     useEffect(() => {
@@ -128,7 +126,6 @@ const Challenge = () => {
 
     const updateUserInfoToDB = () => {
         if (Object.keys(pendingUpdatesRef.current).length > 0 && !lockUpdate) {
-            console.log("Update user", pendingUpdatesRef.current);
             dispatch(updateActivityWithUser({
                 telegramId, 
                 data_activity: pendingUpdatesRef.current,
@@ -159,8 +156,6 @@ const Challenge = () => {
         shootManSpark();
         setTapLimit(prev => prev - 1);
 
-        console.log("Tap Limit", tapLimit);
-
         dispatch({
             type: UPDATE_ACTIVITY_WITH_USER,
             payload: {
@@ -172,8 +167,6 @@ const Challenge = () => {
         const newUpdates = {
             ...pendingUpdatesRef.current,
             tapLimit: tapLimit - 1,
-            currentEnergy: mine.curHealth,
-            levelIndex: userData.levelIndex,
             points: counts + 1,
         };
 
@@ -218,12 +211,8 @@ const Challenge = () => {
                         if (curHealth < 0) curHealth = 0;
                         const newUpdate = {
                             ...pendingUpdatesRef.current,
-                            tapLimit: tapLimit,
                             currentEnergy: curHealth,
-                            levelIndex: userData.levelIndex,
-                            points: counts,
                         };
-
                         setPendingUpdates(newUpdate);
                         dispatch({
                             type: UPDATE_ACTIVITY_WITH_USER,
@@ -301,7 +290,13 @@ const Challenge = () => {
             let curAttack = cur.attack + boost[0];
             let attackItems = cur.attackItems - 1;
             let data = { levelIndex: userData.levelIndex, attackItems: attackItems };
-            dispatch(updateUser({ telegramId, data }));
+            dispatch(updateActivityWithUser({ telegramId, data_activity: data }));
+            dispatch({
+                type: UPDATE_USER_WITH_ATTACK,
+                payload: {
+                    attackItems: attackItems
+                }
+            });
             return {
                 ...cur,
                 curAttack,
@@ -319,8 +314,15 @@ const Challenge = () => {
         setMine(cur => {
             let curDefence = cur.defence + boost[1];
             let defenceItems = cur.defenceItems - 1;
+            console.log("defenceItems", defenceItems);
             let data = { levelIndex: userData.levelIndex, defenceItems: defenceItems };
-            dispatch(updateUser({ telegramId, data }));
+            dispatch(updateActivityWithUser({ telegramId, data_activity: data }));
+            dispatch({
+                type: UPDATE_USER_WITH_DEFENCE,
+                payload: {
+                    defenceItems: defenceItems
+                }
+            });
             return {
                 ...cur,
                 curDefence,
@@ -339,7 +341,13 @@ const Challenge = () => {
             let curHealth = (cur.curHealth + boost[2] > cur.totalHealth) ? cur.totalHealth : cur.curHealth + boost[2];
             let lifeItems = cur.lifeItems - 1;
             let data = { levelIndex: userData.levelIndex, lifeItems: lifeItems };
-            dispatch(updateUser({ telegramId, data }));
+            dispatch(updateActivityWithUser({ telegramId, data_activity: data }));
+            dispatch({
+                type: UPDATE_USER_WITH_LIFE,
+                payload: {
+                    lifeItems: lifeItems
+                }
+            });
             return {
                 ...cur,
                 curHealth,
@@ -466,7 +474,6 @@ const Challenge = () => {
                         <p className="text-[20px] font-bold">Battle Time Elapsed:</p>
                         <div style={{ textAlign: 'center'}}>
                             <div style={{ fontSize: '48px', fontWeight: 'bold' }}>
-                                {/* {Math.ceil(battleTime / (1000 / timeDuration)).toString().padStart(2, '0')} */}
                                 {Math.ceil(battleTime).toString().padStart(2, '0')}
                             </div>
                         </div>
@@ -522,23 +529,29 @@ const Challenge = () => {
                         </div>
                     </div>
 
-                    <div className="flex gap-5 mt-[40px] px-4">
-                        <div className="flex flex-col border bg-[#b0f3b688] rounded-lg relative cursor-pointer px-1 hover:bg-[#5bb96388]" onClick={handleAttack} style={{visibility: mine && mine.attackItems == 0 ? "hidden" : "visible"}}>
-                            <img src="/assets/weapon/weapon8.png" alt='weapon' className="w-[40px] h-[40px] p-[4px]"/>
-                            <p className='text-deep-orange-900 font-bold text-[14px]'>(+{boost[0]})</p>
-                            <p className='text-deep-orange-900 font-extrabold text-[16px] border-t-2'>{mine && mine.attackItems}</p>
-                        </div>
-                        <div className="flex flex-col border bg-[#b0f3b688] rounded-lg relative cursor-pointer px-1 hover:bg-[#5bb96388]" onClick={handleDefence} style={{visibility: mine && mine.defenceItems == 0 ? "hidden" : "visible"}}>
-                            <img src="/assets/shield/shield6.png" alt='weapon' className="w-w-[40px] h-[40px] p-[4px]"/>
-                            <p className='text-deep-orange-900 font-bold text-[14px]'>(+{boost[1]})</p>
-                            <p className='text-deep-orange-900 font-extrabold text-[16px] border-t-2'>{mine && mine.defenceItems}</p>
-                        </div>
-                        <div className="flex flex-col border bg-[#b0f3b688] rounded-lg relative cursor-pointer px-1 hover:bg-[#5bb96388]" onClick={handleEnergy} style={{visibility: mine && mine.lifeItems == 0 ? "hidden" : "visible"}}>
-                            <img src="/assets/img/heart.png" alt='weapon' className="w-[40px] h-[40px] p-[4px]"/>
-                            <p className='text-deep-orange-900 font-bold text-[14px]'>(+{boost[2]})</p>
-                            <p className='text-deep-orange-900 font-extrabold text-[16px] border-t-2'>{mine && mine.lifeItems}</p>
-                        </div>
-                        <div className="flex gap-1 items-center">
+                    <div className="flex gap-3 mt-[40px] px-4">
+                        <BoostTouch
+                            className="mt-[20px]"
+                            onClick={handleAttack}
+                            hidden={mine && mine.attackItems == 0}
+                            src="/assets/weapon/weapon8.png"
+                            unit={50}
+                            value={mine && mine.attackItems} />
+                        <BoostTouch
+                            className="mt-[20px]" 
+                            onClick={handleDefence}
+                            hidden={mine && mine.defenceItems == 0}
+                            src="/assets/shield/shield6.png"
+                            unit={30}
+                            value={mine && mine.defenceItems} />
+                        <BoostTouch
+                            className="mt-[20px]" 
+                            onClick={handleEnergy}
+                            hidden={mine && mine.lifeItems == 0}
+                            src="/assets/img/heart.png"
+                            unit={100}
+                            value={mine && mine.lifeItems} />
+                        <div className="flex gap-1 pl-7 items-center">
                             <img src="/assets/img/platinum.webp" alt='coin' className="w-[60px] h-[60px] cursor-pointer" onClick={handleShoot}/>
                             <div className="flex flex-col justify-center">
                                 <p className="text-[36px] font-bold text-white">{tapLimit}</p>

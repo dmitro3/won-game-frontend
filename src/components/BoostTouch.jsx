@@ -5,7 +5,7 @@ const BoostTouch = ({onClick, hidden, src, unit, isInUsing, value, className}) =
 
     return (
         <div className={`flex flex-col bg-[#FFC658EE] rounded-lg relative 
-            ursor-pointer h-fit px-1 border-b-[3px] border-r-[3px] border-[#c18f2d] shadow ` + className}
+            cursor-pointer h-fit px-1 border-b-[3px] border-r-[3px] border-[#c18f2d] shadow ` + className}
             onClick={onClick} 
             style={{visibility: hidden ? "hidden" : "visible"}}>
             <img src={src} alt='weapon' className="w-[40px] h-[40px] p-[4px]"/>

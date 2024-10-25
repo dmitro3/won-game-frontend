@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Progress, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Typography, Spinner } from "@material-tailwind/react";
+import { Dialog, DialogHeader, DialogBody, DialogFooter, Typography, Spinner } from "@material-tailwind/react";
 import Milestones from "../components/Milestones";
 import styled, { keyframes } from "styled-components";
 import { useDispatch, useSelector } from 'react-redux';
@@ -7,7 +7,7 @@ import { updateUser } from '../actions/user';
 import { updateActivity, updateActivityWithUser } from '../actions/activity';
 import { showPayment } from '../actions/other';
 import { useNavigate } from 'react-router-dom';
-import { UPDATE_ACTIVITY_WITH_USER } from '../constants/activityConstants';
+import { UPDATE_ACTIVITY_WITH_USER, UPDATE_USER_WITH_LIFE } from '../constants/activityConstants';
 import Info from '../components/Info';
 import BoostTouch from '../components/BoostTouch';
 import Progressbar from '../components/Progressbar';
@@ -143,12 +143,13 @@ const Earn = () => {
 
     useEffect(() => {
         pendingUpdatesRef.current = pendingUpdates;
+        console.log("Update user", pendingUpdatesRef.current);
     }, [pendingUpdates]);
 
     useEffect(() => {
         const interval = setInterval(() => {
             if (Object.keys(pendingUpdatesRef.current).length > 0 && !lockUpdate) {
-                console.log("Update user", pendingUpdatesRef.current);
+                
                 dispatch(updateActivityWithUser({
                     telegramId, 
                     data_activity: pendingUpdatesRef.current,
@@ -260,14 +261,34 @@ const Earn = () => {
     }
 
     const handleEnergy = () => {
-        if (userData.lifeItems <= 0) return;
-        if (isUsingHP) return;
+        if (mine.lifeItems <= 0) return;
+        // if (isUsingHP) return;
 
-        setIsUsingHP(true);
+        // setIsUsingHP(true);
         let curHealth = (currentEnergy + 100 > totalEnergy) ? totalEnergy : currentEnergy + 100;
-        let lifeItems = userData.lifeItems - 1;
-        let data = { levelIndex: userData.levelIndex, currentEnergy: curHealth, lifeItems: lifeItems };
-        dispatch(updateUser({ telegramId, data }, () => setIsUsingHP(false)));
+        let lifeItems = mine.lifeItems - 1;
+        setCurrentEnergy(curHealth);
+        setMine((prev)=>{
+            return {
+                ...prev,
+                curHealth: curHealth,
+                lifeItems: lifeItems
+            }
+        });
+
+        dispatch({
+            type: UPDATE_USER_WITH_LIFE,
+            payload: {
+                lifeItems: lifeItems
+            }
+        });
+
+        const newUpdates = {
+            ...pendingUpdatesRef.current,
+            currentEnergy: curHealth,
+            lifeItems: lifeItems
+        };
+        setPendingUpdates(newUpdates);
     }
 
     return (

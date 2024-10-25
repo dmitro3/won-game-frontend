@@ -1,5 +1,5 @@
 import { UPDATE_TOKEN, UPDATE_USER, VIEW_USER } from '../constants/userConstants';
-import { UPDATE_ACTIVITY_WITH_USER } from '../constants/activityConstants';
+import { UPDATE_ACTIVITY_WITH_USER, UPDATE_USER_WITH_LIFE, UPDATE_USER_WITH_ATTACK, UPDATE_USER_WITH_DEFENCE } from '../constants/activityConstants';
 
 const initialState = {
 	user: {},
@@ -30,7 +30,22 @@ const earnReducer = (state = initialState, action) => {
 			state.user['currentEnergy'] = payload.energy;
 			return {
 				...state,
+			}
+		case UPDATE_USER_WITH_LIFE:
+			state.user['lifeItems'] = payload.lifeItems;
+			return {
+				...state,
 			}	
+		case UPDATE_USER_WITH_ATTACK:
+			state.user['defenceItems'] = payload.defenceItems;
+			return {
+				...state,
+			}
+		case UPDATE_USER_WITH_DEFENCE:
+			state.user['attackItems'] = payload.attackItems;
+			return {
+				...state,
+			}
 		default:
 			return state;
 	}
