@@ -9,6 +9,8 @@ import { isSafeValue } from '../utils';
 import { getItem, viewAll } from '../actions/mine';
 import { useNavigate } from 'react-router-dom';
 import { UPDATE_ACTIVITY_WITH_USER } from '../constants/activityConstants';
+import TapButton from "../components/TapButton";
+import UserInfo from "../components/UserInfo";
 
 let interval;
 let timeDuration = 50; // ms
@@ -336,56 +338,21 @@ const Challenge = () => {
                 <div className="w-full h-full p-2 z-10 bg-[#000E] absolute bg-[url('/assets/img/bg_vs.png')] bg-cover bg-center min-h-screen">
                     <div className="bg-blue-gray-500top-0 left-0 z-40 p-2">
                         <div className="flex flex-center justify-between items-center mt-[20px] px-3">
-                            <div className="flex flex-col justify-start border-[5px] border-blue-500 py-4 px-2 rounded-lg bg-[#6CF47F66]">
-                                <img src={mine && mine.avatar ? mine.avatar : "/assets/character/man1.png"} alt='avatar' 
-                                    className="w-[120px] h-[160px] mx-auto"/>
-                                <div className="flex gap-2 items-center mt-5">
-                                    <img src="/assets/img/heart.png" alt='avatar' className="w-[22px] h-[22px]"/>
-                                    <p className='text-white text-[24px]'>{mine && mine.curHealth}</p>
-                                </div>
-                                <div className="flex gap-2 items-center">
-                                    <img src="/assets/challenge/attack.png" alt='avatar' className="w-[22px] h-[22px]"/>
-                                    <p className='text-white text-[24px]'>{mine && mine.attack}</p>
-                                </div>
-                                <div className="flex gap-2 items-center">
-                                    <img src="/assets/challenge/defence.png" alt='avatar' className="w-[22px] h-[22px]"/>
-                                    <p className='text-white text-[24px]'>{mine && mine.defence}</p>
-                                </div>
-                                <div className="flex gap-2 items-center">
-                                    <img src="/assets/img/loader.webp" alt='avatar' className="w-[22px] h-[22px]"/>
-                                    <p className='text-white text-[24px]'>{mine && mine.tokens}</p>
-                                </div>
-                            </div>
 
-                            <div className="flex flex-col justify-start border-[5px] border-red-500 py-4 px-2 rounded-lg bg-[#6CF47F66]">
-                                <img src="/assets/monster/monster1.png" alt='avatar' 
-                                    className="w-[120px] h-[160px] mx-auto p-3"/>
-                                <div className="flex gap-2 items-center mt-5">
-                                    <img src="/assets/img/heart.png" alt='avatar' className="w-[22px] h-[22px]"/>
-                                    <p className='text-white text-[24px] font-bold'>{selMonster && selMonster.energyLimit}</p>
-                                </div>
-                                <div className="flex gap-2 items-center">
-                                    <img src="/assets/challenge/attack.png" alt='avatar' className="w-[22px] h-[22px]"/>
-                                    <p className='text-white text-[24px] font-bold'>{selMonster && selMonster.attack}</p>
-                                </div>
-                                <div className="flex gap-2 items-center">
-                                    <img src="/assets/challenge/defence.png" alt='avatar' className="w-[22px] h-[22px]"/>
-                                    <p className='text-white text-[24px] font-bold'>{selMonster && selMonster.defense}</p>
-                                </div>
-                                <div className="flex gap-2 items-center">
-                                    <img src="/assets/img/loader.webp" alt='avatar' className="w-[22px] h-[22px]"/>
-                                    <p className='text-white text-[24px] font-bold'>{selMonster && selMonster.tokenEarns}</p>
-                                </div>
-                            </div>
+                            <UserInfo color="red" user={mine} />
+                            <UserInfo color='blue' user={{
+                                ...selMonster,
+                                avatar: '/assets/monster/monster1.png',
+                                curHealth: selMonster && selMonster.energyLimit,
+                                defence: selMonster && selMonster.defense,
+                                tokens: selMonster && selMonster.tokenEarns,
+                            }} />
+
                         </div>
 
                         <div className="flex justify-between p-4 mt-10">
-                            <button className="bg-[#FFC658] hover:bg-[#FFC658EE] text-[#C94A0C] text-[20px] py-2 font-bold px-6 border-b-[4px] border-r-[4px] border-[#c18f2d] shadow rounded w-[140px]" onClick={() => startFighting()}>
-                                Fight
-                            </button>
-                            <button className="bg-[#FFC658] hover:bg-[#FFC658EE] text-[#C94A0C] text-[20px] py-2 font-bold px-6 border-b-[4px] border-r-[4px] border-[#c18f2d] shadow rounded w-[140px]" onClick={()=>nav("/home")}>
-                                Cancel
-                            </button>
+                            <TapButton text="Fight" onClick={startFighting} size="lg" />
+                            <TapButton text="Cancel" onClick={() => nav("/home")} size="lg" />
                         </div>
 
                     </div>

@@ -1,13 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Animate from "../components/Animate";
 import ShopItem from '../components/ShopItem';
-import Charater from '../components/Character';
+import Character from '../components/Character';
 import { useDispatch, useSelector } from 'react-redux';
 import { buyItem } from '../actions/shop';
 import { viewAll } from '../actions/mine';
 import { unlockCharacter } from '../actions/character';
 import { updateUser } from '../actions/user';
 import { showPayment } from '../actions/other';
+import CoinIndicator from '../components/CoinIndicator';
 
 const Shop = () => {
     const userData = useSelector((state) => state.user.user);
@@ -46,21 +47,13 @@ const Shop = () => {
         <Animate>
             <div className="max-w-sm mx-auto bg-[#69423E] text-white p-6 h-full overflow-y-auto pb-[100px]">
                 <div className='flex justify-between px-5'>
-                    <div className='flex gap-2 items-center'>
-                        <img 
-                            src="/assets/img/loader.webp"
-                            alt='coin' 
-                            width="30px"
-                            height="30px"
-                        />
-                        <p className='text-white text-lg'>{userData.tokens}</p>
-                    </div>
+                    <CoinIndicator value={userData.tokens} iconDelta={8} size='lg' />
                     <div>
                         <img src="/assets/shop/shop.png" alt="logo" className="w-[80px] h-[80px]"/>
                     </div>
                 </div>
                 <div>
-                    <Charater onItemSelect={handleCharacterClick}/>
+                    <Character onItemSelect={handleCharacterClick}/>
                     <ShopItem onItemSelect={handleItemClick}/>
                 </div>
             </div>

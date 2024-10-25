@@ -14,6 +14,8 @@ import showToast from '../utils/toast';
 // actions
 import { updateUser } from '../actions/user';
 import { updateToken } from '../actions/user';
+import TapButton from '../components/TapButton';
+import CoinIndicator from '../components/CoinIndicator';
 
 
 const BuyToken = ({onSubmit, onClose}) => {
@@ -151,29 +153,7 @@ const BuyToken = ({onSubmit, onClose}) => {
                     Trade
                 </Typography>
 
-                <div className="mb-4 flex gap-2 justify-center items-center">
-                    <img src='/assets/img/loader.webp' alt="avatar" 
-                        className="h-[30px] w-[30px] rounded-full" />
-                    <Typography variant='h5' color='white'>{isSafeValue(userData.tokens, 1)}</Typography>
-                </div>
-
-                <div className="mb-6 flex gap-4 justify-center items-center">
-                    <div className='flex gap-1'>
-                        <img src='/assets/img/attack2.png' alt="avatar" 
-                            className="h-[30px] w-[30px] rounded-full" />
-                        <Typography variant='h6' color='white'>{isSafeValue(userData.attackItems, 1)}</Typography>
-                    </div>
-                    <div className='flex gap-1'>
-                        <img src='/assets/img/defence2.png' alt="avatar" 
-                            className="h-[30px] w-[30px] rounded-full" />
-                        <Typography variant='h6' color='white'>{isSafeValue(userData.defenceItems, 1)}</Typography>
-                    </div>
-                    <div className='flex gap-1'>
-                        <img src='/assets/img/life2.png' alt="avatar" 
-                            className="h-[30px] w-[30px] rounded-full" />
-                        <Typography variant='h6' color='white'>{isSafeValue(userData.lifeItems, 1)}</Typography>
-                    </div>
-                </div>
+                <CoinIndicator className='mb-4' value={isSafeValue(userData.tokens, 1)} size='lg' />
 
                 <div className="mb-2 flex justify-between items-center">
                     <div className='flex gap-2 items-center'>
@@ -194,12 +174,19 @@ const BuyToken = ({onSubmit, onClose}) => {
                 </div>
 
                 <div className='flex items-center bg-green justify-end'>
-                    <button className="bg-[#FFC658] hover:bg-[#FFC658EE] text-[#C94A0C] font-bold py-1 px-2 border-b-[3px] border-r-[3px] border-[#c18f2d] shadow rounded" onClick={handleWallet}>
-                        Claim
-                    </button>
+                    <TapButton text="Claim" onClick={handleWallet} size="sm" className="py-1 min-w-[64px]" />
                 </div>
 
-                <div className='mt-4 mb-8 border border-bottom-1 border-[#FFF]'></div>
+                <div className='mt-2 mb-4 border border-bottom-1 border-[#FFF]'></div>
+
+                <div className="mb-6 flex gap-4 justify-center items-center">
+                    <CoinIndicator icon='/assets/img/attack2.png' iconDelta={8}
+                        value={isSafeValue(userData.attackItems, 1)} />
+                    <CoinIndicator icon='/assets/img/defence2.png' iconDelta={8}
+                        value={isSafeValue(userData.defenceItems, 1)} />
+                    <CoinIndicator icon='/assets/img/life2.png' iconDelta={8}
+                        value={isSafeValue(userData.lifeItems, 1)} />
+                </div>
 
                 {
                     items.map((item, idx) => {
@@ -221,11 +208,10 @@ const BuyToken = ({onSubmit, onClose}) => {
                                         className="h-[30px] w-[30px]" />
                                     <div>{item.tokenNeeded * itemVal}</div>
                                 </div>
-                                <button className="bg-[#FFC658] hover:bg-[#FFC658EE] text-[#C94A0C] font-bold py-1 px-2 border-b-[3px] border-r-[3px] border-[#c18f2d] shadow rounded" onClick={() => claimItems(idx)}>
-                                    <div className="flex justify-center w-[45px]">
-                                        {loadingState[idx] ? <Spinner /> : "Claim"}
-                                    </div>
-                                </button>
+                                
+                                <TapButton text="Claim" size="sm" className="py-1 min-w-[64px]" 
+                                    onClick={() => claimItems(idx)} 
+                                    busy={loadingState[idx]} />
                             </div>
                         );
                     })
@@ -237,9 +223,8 @@ const BuyToken = ({onSubmit, onClose}) => {
                         * Not enough token to buy items.
                     </div>
                 }
-                <button className="bg-[#FFC658] hover:bg-[#FFC658EE] text-[#C94A0C] font-bold py-1 px-2 border-b-[3px] border-r-[3px] border-[#c18f2d] shadow rounded mt-6" onClick={() => onClose()}>
-                    Close
-                </button>
+
+                <TapButton text="Close" size="sm" className="py-1 min-w-[64px]" onClick={() => onClose()} />
             </div>
         </Animate>
         
